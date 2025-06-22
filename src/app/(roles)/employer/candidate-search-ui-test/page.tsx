@@ -16,8 +16,6 @@ import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { useToast } from "@/hooks/use-toast";
-import { Toaster } from "@/components/ui/toaster";
 
 
 const industryTypeOptions = ["All Industry Types", "Technology", "Healthcare", "Finance", "Education", "Manufacturing", "Retail", "Marketing", "Other"];
@@ -241,7 +239,7 @@ const SkillsAndLocationsFilter: React.FC<SkillsAndLocationsFilterProps> = ({
     <AddRemoveTagsInput label="Skills" placeholder="e.g., Python, React" currentInputValue={currentSkillInput} setCurrentInputValue={setCurrentSkillInput} items={skills} setItems={setSkills} maxItems={15} inputRef={skillInputRef} />
     <Separator />
     <div>
-      <AddRemoveTagsInput label="Current Locations" placeholder="City, State or Remote" currentInputValue={currentLocationInput} setCurrentInputValue={setCurrentLocationInput} items={locations} setItems={setLocations} maxItems={5} inputRef={locationInputRef} />
+      <AddRemoveTagsInput label="Current Locations" placeholder="City, State or Remote" currentInputValue={currentLocationInput} setCurrentLocationInput={setCurrentLocationInput} items={locations} setItems={setLocations} maxItems={5} inputRef={locationInputRef} />
       <div className="flex items-center space-x-2 mt-2.5">
         <Checkbox id="include-relocating" checked={includeRelocatingCandidates} onCheckedChange={(checked) => setIncludeRelocatingCandidates(!!checked)} />
         <Label htmlFor="include-relocating" className="text-xs font-normal text-muted-foreground cursor-pointer">
@@ -581,7 +579,7 @@ interface CandidateDetailProps {
   onBack: () => void;
   handleAddSingleToWatchlist: (candidate: Candidate) => void;
   keywords: string[];
-  designationInput:<string>;
+  designationInput: string;
   includedCompanies: string[];
   locations: string[];
   industryInput: string;
@@ -1040,7 +1038,6 @@ export default function CandidateSearchUITestPage() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true);
-  const { toast } = useToast();
 
   const [activeView, setActiveView] = useState<'search' | 'details'>('search');
   const [selectedCandidateDetailId, setSelectedCandidateDetailId] = useState<string | null>(null);
@@ -1061,7 +1058,7 @@ export default function CandidateSearchUITestPage() {
   const [selectedGender, setSelectedGender] = useState(genderOptions[0]);
   const [minAge, setMinAge] = useState(''); const [maxAge, setMaxAge] = useState('');
   const [isJobDescriptionModalOpen, setIsJobDescriptionModalOpen] = useState(false); const [jobDescriptionText, setJobDescriptionText] = useState('');
-  const [isGeneratingFilters, setIsGeneratingFilters<boolean>(false); const [llmGenerationError, setLlmGenerationError] = useState<string | null>(null);
+  const [isGeneratingFilters, setIsGeneratingFilters] = useState(false); const [llmGenerationError, setLlmGenerationError] = useState<string | null>(null);
   const [isPostedJobsModalOpen, setIsPostedJobsModalOpen] = useState(false);
   const [savedSearches, setSavedSearches] = useState<any[]>([]); const [isSavedSearchesModalOpen, setIsSavedSearchesModalOpen] = useState(false);
   const [totalResultsCount, setTotalResultsCount] = useState<number>(0);
@@ -1082,7 +1079,7 @@ export default function CandidateSearchUITestPage() {
     const checkAuthentication = () => {
       // Check if user is authenticated (you can modify this logic based on your auth implementation)
       const isLoggedIn = typeof window !== 'undefined' && localStorage.getItem('isAuthenticated') === 'true';
-
+      
       if (!isLoggedIn) {
         setIsAuthModalOpen(true);
         setIsAuthenticated(false);
@@ -1199,7 +1196,7 @@ export default function CandidateSearchUITestPage() {
     if (hasUserInitiatedSearch && areFiltersActive()) {
       setCandidatesLoading(true);
       setCandidatesError(null);
-
+      
       const loadPage = async () => {
         try {
           const filters = getCurrentFilters();
@@ -1240,39 +1237,22 @@ export default function CandidateSearchUITestPage() {
     setSelectedCandidateIds([]);
   }, []);
 
-  const handleFilterByPostedJob = useCallback((job: any) => {
-    // Extract keywords from job title and description
-    const jobKeywords = job.title.split(' ').concat(job.skillsRequired ? job.skillsRequired.split(',').map((s: string) => s.trim()) : []);
-    const uniqueKeywords = [...new Set(jobKeywords.filter((k: string) => k.length > 2))];
-
-    setKeywords(uniqueKeywords);
-    setDesignationInput(job.title);
-    setSkills(job.skillsRequired ? job.skillsRequired.split(',').map((s: string) => s.trim()) : []);
-    setLocations(job.jobLocation ? [job.jobLocation] : []);
-    setMinExperience(job.minimumExperience ? job.minimumExperience.toString() : '');
-    setMaxExperience(job.maximumExperience ? job.maximumExperience.toString() : '');
-    setMinSalary(job.minimumSalary ? job.minimumSalary.toString() : '');
-    setMaxSalary(job.maximumSalary ? job.maximumSalary.toString() : '');
-    setQualifications(job.qualification ? [job.qualification] : []);
-
-    setCurrentPage(1);
-    setHasUserInitiatedSearch(true);
-    setFetchTrigger(prev => prev + 1);
+  const handleFilterByPostedJob = useCallback((jobFilters: any) => {
+    setKeywords(jobFilters.keywords || []); setSkills(jobFilters.skills || []); setDesignationInput(jobFilters.designation || '');
+    setMinExperience(jobFilters.minExperience || ''); setMaxExperience(jobFilters.maxExperience || '');
+    setLocations(jobFilters.locations || []); setMinSalary(jobFilters.minSalaryLPA ? String(jobFilters.minSalaryLPA) : '');
+    setMaxSalary(jobFilters.maxSalaryLPA ? String(jobFilters.maxSalaryLPA) : '');
+    setQualifications(jobFilters.qualifications || []); setIndustryInput(jobFilters.industry || '');
     setIsPostedJobsModalOpen(false);
-
-    toast({
-      title: "🎯 Job Filters Applied",
-      description: `Search filters have been set based on "${job.title}". Finding matching candidates...`,
-      variant: "default",
-    });
-  }, []);
+    setTimeout(() => handleSearchCandidates(), 100);
+  }, [handleSearchCandidates]);
 
   const handleSaveSearch = useCallback(async () => {
     const searchName = prompt("Enter a name for this saved search:");
     if (!searchName?.trim()) return;
-
+    
     const currentFilters = {keywords, excludedKeywords, designationInput, includePreviousDesignations, includedCompanies, excludedCompanies, skills, locations, includeRelocatingCandidates, industryInput, selectedIndustryType, minExperience, maxExperience, minSalary, maxSalary, qualifications, selectedGender, minAge, maxAge};
-
+    
     try {
       const response = await fetch('/api/saved-searches', {
         method: 'POST',
@@ -1287,87 +1267,50 @@ export default function CandidateSearchUITestPage() {
       if (response.ok) {
         const { savedSearch } = await response.json();
         setSavedSearches(prev => [...prev, savedSearch]);
-        toast({
-          title: "💾 Search Saved",
-          description: `Your search "${searchName}" has been saved successfully and can be reused anytime.`,
-          variant: "default",
-        });
+        alert("Search saved successfully!");
       } else {
-        const error = await response.json();
-        toast({
-          title: "❌ Error",
-          description: error.error || "Failed to save search filters.",
-          variant: "destructive",
-        });
+        alert("Failed to save search. Please try again.");
       }
     } catch (error) {
-      toast({
-        title: "❌ Error",
-        description: "Network error. Please try again.",
-        variant: "destructive",
-      });
+      console.error("Error saving search:", error);
+      alert("Failed to save search. Please try again.");
     }
-  }, [keywords, excludedKeywords, designationInput, includePreviousDesignations, includedCompanies, excludedCompanies, skills, locations, includeRelocatingCandidates, industryInput, selectedIndustryType, minExperience, maxExperience, minSalary, maxSalary, qualifications, selectedGender, minAge, maxAge, currentUserId, toast]);
+  }, [keywords, excludedKeywords, designationInput, includePreviousDesignations, includedCompanies, excludedCompanies, skills, locations, includeRelocatingCandidates, industryInput, selectedIndustryType, minExperience, maxExperience, minSalary, maxSalary, qualifications, selectedGender, minAge, maxAge, currentUserId]);
 
-  const handleApplySavedSearch = (filters: any) => {
-    setKeywords(filters.keywords || []);
-    setExcludedKeywords(filters.excludedKeywords || []);
-    setDesignationInput(filters.designationInput || '');
-    setIncludedCompanies(filters.includedCompanies || []);
-    setExcludedCompanies(filters.excludedCompanies || []);
-    setSkills(filters.skills || []);
-    setLocations(filters.locations || []);
-    setMinExperience(filters.minExperience || '');
-    setMaxExperience(filters.maxExperience || '');
-    setMinSalary(filters.minSalary || '');
-    setMaxSalary(filters.maxSalary || '');
-    setQualifications(filters.qualifications || []);
-    setSelectedIndustryType(filters.selectedIndustryType || industryTypeOptions[0]);
-    setSelectedGender(filters.selectedGender || genderOptions[0]);
-    setMinAge(filters.minAge || '');
-    setMaxAge(filters.maxAge || '');
+  const handleApplySavedSearch = useCallback((savedFilterSet: any) => {
+    setKeywords(savedFilterSet.keywords || []); setExcludedKeywords(savedFilterSet.excludedKeywords || []);
+    setDesignationInput(savedFilterSet.designationInput || ''); setIncludePreviousDesignations(savedFilterSet.includePreviousDesignations || false);
+    setIncludedCompanies(savedFilterSet.includedCompanies || []); setExcludedCompanies(savedFilterSet.excludedCompanies || []);
+    setSkills(savedFilterSet.skills || []); setLocations(savedFilterSet.locations || []);
+    setIncludeRelocatingCandidates(savedFilterSet.includeRelocatingCandidates || false); setIndustryInput(savedFilterSet.industryInput || '');
+    setSelectedIndustryType(savedFilterSet.selectedIndustryType || industryTypeOptions[0]); setMinExperience(savedFilterSet.minExperience || '');
+    setMaxExperience(savedFilterSet.maxExperience || ''); setMinSalary(savedFilterSet.minSalary || '');
+    setMaxSalary(savedFilterSet.maxSalary || ''); setQualifications(savedFilterSet.qualifications || []);
+    setSelectedGender(savedFilterSet.selectedGender || genderOptions[0]); setMinAge(savedFilterSet.minAge || '');
+    setMaxAge(savedFilterSet.maxAge || '');
+    setIsSavedSearchesModalOpen(false);
+    setTimeout(() => handleSearchCandidates(), 100);
+  }, [handleSearchCandidates]);
 
-    setCurrentPage(1);
-    setHasUserInitiatedSearch(true);
-    setFetchTrigger(prev => prev + 1);
-
-    toast({
-      title: "🔍 Search Applied",
-      description: "Saved search filters have been applied. Results are being updated.",
-      variant: "default",
-    });
-  };
-
-  const handleDeleteSavedSearch = async (searchId: string) => {
+  const handleDeleteSavedSearch = useCallback(async (searchId: string) => {
+    if (!confirm("Are you sure you want to delete this saved search?")) return;
+    
     try {
-      const searchToDelete = savedSearches.find(s => s.id === searchId);
       const response = await fetch(`/api/saved-searches?id=${searchId}&userId=${currentUserId}`, {
         method: 'DELETE'
       });
 
       if (response.ok) {
-        setSavedSearches(prev => prev.filter(s => s.id !== searchId));
-        toast({
-          title: "🗑️ Search Deleted",
-          description: `Saved search "${searchToDelete?.name || 'Unknown'}" has been deleted permanently.`,
-          variant: "default",
-        });
+        setSavedSearches(prev => prev.filter(search => search.id !== searchId));
+        alert("Saved search deleted successfully!");
       } else {
-        const error = await response.json();
-        toast({
-          title: "❌ Error",
-          description: error.error || "Failed to delete saved search.",
-          variant: "destructive",
-        });
+        alert("Failed to delete saved search.");
       }
     } catch (error) {
-      toast({
-        title: "❌ Error",
-        description: "Network error. Please try again.",
-        variant: "destructive",
-      });
+      console.error("Error deleting saved search:", error);
+      alert("Failed to delete saved search.");
     }
-  };
+  }, [currentUserId]);
 
   const handleGenerateFiltersFromJD = useCallback(async () => {
     if (!jobDescriptionText.trim()) { setLlmGenerationError("Please paste a job description to generate filters."); return; }
@@ -1449,35 +1392,19 @@ export default function CandidateSearchUITestPage() {
 
       if (response.ok) {
         setWatchlistCandidates(prev => [...prev, candidate]);
-        toast({
-          title: "✅ Added to Watchlist",
-          description: `${candidate.name} added to watchlist.`,
-          variant: "default",
-        });
+        alert(`${candidate.name} added to watchlist.`);
       } else if (response.status === 409) {
-        toast({
-          title: "ℹ️ Already in Watchlist",
-          description: `${candidate.name} is already in your watchlist.`,
-          variant: "default",
-        });
+        alert(`${candidate.name} is already in your watchlist.`);
       } else {
-        toast({
-          title: "❌ Error",
-          description: "Failed to add candidate to watchlist.",
-          variant: "destructive",
-        });
+        alert("Failed to add candidate to watchlist.");
       }
     } catch (error) {
       console.error("Error adding to watchlist:", error);
-      toast({
-        title: "❌ Error",
-        description: "Failed to add candidate to watchlist.",
-        variant: "destructive",
-      });
+      alert("Failed to add candidate to watchlist.");
     }
-  }, [currentUserId, toast]);
+  }, [currentUserId]);
 
-  const handleRemoveFromWatchlist = async (candidateId: string) => {
+  const handleRemoveFromWatchlist = useCallback(async (candidateId: string) => {
     try {
       const response = await fetch(`/api/watchlist?employerUserId=${currentUserId}&candidateId=${candidateId}`, {
         method: 'DELETE'
@@ -1485,28 +1412,15 @@ export default function CandidateSearchUITestPage() {
 
       if (response.ok) {
         setWatchlistCandidates(prev => prev.filter(candidate => candidate.id !== candidateId));
-        setSelectedCandidateIds(prev => prev.filter(id => id !== candidateId));
-        toast({
-          title: "🗑️ Removed from Watchlist",
-          description: `Candidate removed from watchlist.`,
-          variant: "default",
-        });
+        alert("Candidate removed from watchlist.");
       } else {
-        toast({
-          title: "❌ Error",
-          description: "Failed to remove candidate from watchlist.",
-          variant: "destructive",
-        });
+        alert("Failed to remove candidate from watchlist.");
       }
     } catch (error) {
       console.error("Error removing from watchlist:", error);
-      toast({
-        title: "❌ Error",
-        description: "Failed to remove candidate from watchlist.",
-        variant: "destructive",
-      });
+      alert("Failed to remove candidate from watchlist.");
     }
-  };
+  }, [currentUserId]);
 
   const handleSelectCandidate = useCallback((candidateId: string) => {
     setSelectedCandidateIds(prev =>
@@ -1558,7 +1472,6 @@ export default function CandidateSearchUITestPage() {
 
   return (
     <TooltipProvider>
-      <Toaster />
       <div className="flex flex-col min-h-screen bg-background text-foreground font-inter">
         <Card className="shadow-xl border-border rounded-xl overflow-hidden">
           <MainHeader
@@ -1656,7 +1569,7 @@ export default function CandidateSearchUITestPage() {
                           </Button>
                           {isAdditionalParametersOpen && (
                             <div className="mt-2 pl-2 border-l-2 border-muted space-y-4 py-2">
-                              <AddRemoveTagsInput label="Qualifications" placeholder="e.g., MBA, B.Tech, PhD" currentInputValue={currentQualificationInput} setCurrentInputValue={currentQualificationInput} items={qualifications} setItems={setQualifications} maxItems={5} inputRef={qualificationInputRef} />
+                              <AddRemoveTagsInput label="Qualifications" placeholder="e.g., MBA, B.Tech, PhD" currentInputValue={currentQualificationInput} setCurrentInputValue={setCurrentQualificationInput} items={qualifications} setItems={setQualifications} maxItems={5} inputRef={qualificationInputRef} />
                               <div>
                                 <Label htmlFor="gender-select" className="text-xs font-medium text-foreground">Gender</Label>
                                 <Select value={selectedGender} onValueChange={setSelectedGender}>
@@ -1793,7 +1706,7 @@ export default function CandidateSearchUITestPage() {
                                                                   <Phone className="h-4 w-4" />
                                                               </Button>
                                                           </PopoverTrigger>
-
+                           
                                                           <PopoverContent className="w-auto p-2 flex flex-col items-start gap-1">
                                                               <span className="text-sm font-medium">{candidate.phone}</span>
                                                               <div className="flex gap-2 mt-1">
