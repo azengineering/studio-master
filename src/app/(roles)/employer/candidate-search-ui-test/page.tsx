@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import { AuthRequiredModal } from '@/components/AuthRequiredModal';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -1033,6 +1034,11 @@ const MyWatchlistModal: React.FC<MyWatchlistModalProps> = ({ isOpen, onOpenChang
 
 
 export default function CandidateSearchUITestPage() {
+  // Authentication state
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true);
+
   const [activeView, setActiveView] = useState<'search' | 'details'>('search');
   const [selectedCandidateDetailId, setSelectedCandidateDetailId] = useState<string | null>(null);
 
@@ -1068,7 +1074,30 @@ export default function CandidateSearchUITestPage() {
   const [postedJobs, setPostedJobs] = useState<any[]>([]);
   const [currentUserId] = useState(1); // TODO: Get from auth context
 
-  
+  // Check authentication status on component mount
+  useEffect(() => {
+    const checkAuthentication = () => {
+      // Check if user is authenticated (you can modify this logic based on your auth implementation)
+      const isLoggedIn = typeof window !== 'undefined' && localStorage.getItem('isAuthenticated') === 'true';
+      
+      if (!isLoggedIn) {
+        setIsAuthModalOpen(true);
+        setIsAuthenticated(false);
+      } else {
+        setIsAuthenticated(true);
+      }
+      setIsCheckingAuth(false);
+    };
+
+    checkAuthentication();
+  }, []);
+
+  // Handle auth modal close and redirect
+  const handleAuthModalClose = useCallback(() => {
+    setIsAuthModalOpen(false);
+    // Redirect to home or login page
+    window.location.href = '/';
+  }, []);
 
   // Load data from APIs on component mount
   useEffect(() => {
@@ -1411,6 +1440,35 @@ export default function CandidateSearchUITestPage() {
     setSelectedCandidateDetailId(null);
   }, []);
 
+
+  // Show loading while checking authentication
+  if (isCheckingAuth) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-background">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+        <p className="text-muted-foreground">Checking authentication...</p>
+      </div>
+    );
+  }
+
+  // Show auth modal if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <>
+        <div className="flex flex-col items-center justify-center min-h-screen bg-background">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-primary mb-4">Authentication Required</h1>
+            <p className="text-muted-foreground">Please log in to access the candidate search feature.</p>
+          </div>
+        </div>
+        <AuthRequiredModal
+          isOpen={isAuthModalOpen}
+          onCloseAndGoBack={handleAuthModalClose}
+          userRole="employer"
+        />
+      </>
+    );
+  }
 
   return (
     <TooltipProvider>

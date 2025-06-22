@@ -148,6 +148,7 @@ export async function loginAction(data: LoginFormData): Promise<AuthActionRespon
         }
     }
 
+    // Set authentication status in localStorage (client-side will handle this)
     return { 
       success: true, 
       message: 'Logged in successfully.',

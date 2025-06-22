@@ -50,7 +50,7 @@ export default function LoginPage() {
       role: initialRole, 
     },
   });
-  
+
   useEffect(() => {
     form.reset({ role: initialRole, email: '', password: '' });
   }, [initialRole, form]);
@@ -63,7 +63,7 @@ export default function LoginPage() {
       password: formData.password,
       role: formData.role,
     };
-    
+
     const response: AuthActionResponse = await loginAction(actionData);
     const fromPath = searchParams.get('from');
 
@@ -72,20 +72,21 @@ export default function LoginPage() {
         localStorage.setItem('userRole', response.role);
         localStorage.setItem('userId', String(response.userId)); 
         localStorage.setItem('userEmail', response.email);
+        localStorage.setItem('isAuthenticated', 'true');
         if (response.role === 'employer' && response.companyLogoUrl) {
           localStorage.setItem('companyLogoUrl', response.companyLogoUrl);
         } else {
           localStorage.removeItem('companyLogoUrl'); 
         }
       }
-      
+
       toast({
         title: 'Login Successful!',
         description: 'Redirecting...',
         variant: 'default',
         duration: 1500, 
       });
-      
+
       if (fromPath && fromPath !== currentPathname) { // Ensure 'from' is not the login page itself
         router.push(fromPath);
       } else {
