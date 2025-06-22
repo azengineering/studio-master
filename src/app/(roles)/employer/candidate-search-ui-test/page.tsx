@@ -639,6 +639,14 @@ const CandidateDetail: React.FC<CandidateDetailProps> = React.memo(function Cand
     }
   }, [candidateId]);
 
+  const handleResumeClick = useCallback(() => {
+    if (candidate?.resumePdfUrl && resumePdfRef.current) {
+        resumePdfRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+        console.log(`No resume/CV available for ${candidate?.name || 'Unknown'}`);
+    }
+  }, [candidate?.resumePdfUrl, candidate?.name]);
+
   if (candidateLoading) {
     return (
       <div className="flex flex-col items-center justify-center h-full p-8 text-center bg-card rounded-lg shadow-lg min-h-[400px]">
@@ -658,14 +666,6 @@ const CandidateDetail: React.FC<CandidateDetailProps> = React.memo(function Cand
       </div>
     );
   }
-
-  const handleResumeClick = useCallback(() => {
-    if (candidate?.resumePdfUrl && resumePdfRef.current) {
-        resumePdfRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } else {
-        console.log(`No resume/CV available for ${candidate?.name || 'Unknown'}`);
-    }
-  }, [candidate?.resumePdfUrl, candidate?.name]);
 
 
   return (
