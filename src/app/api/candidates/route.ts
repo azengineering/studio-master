@@ -88,90 +88,85 @@ export async function GET(request: NextRequest) {
 
     // Apply filters
     if (filters.keywords && filters.keywords.length > 0) {
-      const keywordConditions = filters.keywords.map(() => {
-        return `(jsp.fullName LIKE $${paramIndex++} OR jsp.currentDesignation LIKE $${paramIndex++} OR jsp.skills LIKE $${paramIndex++})`;
-      });
-      query += ` AND (${keywordConditions.join(' OR ')})`;
+      const keywordConditions: string[] = [];
       filters.keywords.forEach(keyword => {
+        keywordConditions.push(`(jsp.fullName LIKE ? OR jsp.currentDesignation LIKE ? OR jsp.skills LIKE ?)`);
         params.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`);
       });
+      query += ` AND (${keywordConditions.join(' OR ')})`;
     }
 
     if (filters.excludedKeywords && filters.excludedKeywords.length > 0) {
-      const excludeConditions = filters.excludedKeywords.map(() => {
-        return `(jsp.fullName NOT LIKE $${paramIndex++} AND jsp.currentDesignation NOT LIKE $${paramIndex++} AND jsp.skills NOT LIKE $${paramIndex++})`;
-      });
-      query += ` AND ${excludeConditions.join(' AND ')}`;
       filters.excludedKeywords.forEach(keyword => {
+        query += ` AND (jsp.fullName NOT LIKE ? AND jsp.currentDesignation NOT LIKE ? AND jsp.skills NOT LIKE ?)`;
         params.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`);
       });
     }
 
     if (filters.designationInput) {
-      query += ` AND jsp.currentDesignation LIKE $${paramIndex++}`;
+      query += ` AND jsp.currentDesignation LIKE ?`;
       params.push(`%${filters.designationInput}%`);
     }
 
     if (filters.skills && filters.skills.length > 0) {
-      const skillConditions = filters.skills.map(() => `jsp.skills LIKE $${paramIndex++}`);
-      query += ` AND (${skillConditions.join(' AND ')})`;
       filters.skills.forEach(skill => {
+        query += ` AND jsp.skills LIKE ?`;
         params.push(`%${skill}%`);
       });
     }
 
     if (filters.locations && filters.locations.length > 0) {
-      const locationConditions = filters.locations.map(() => `jsp.currentCity LIKE $${paramIndex++}`);
+      const locationConditions: string[] = [];
+      filters.locations.forEach(location => {
+        locationConditions.push(`jsp.currentCity LIKE ?`);
+        params.push(`%${location}%`);
+      });
+      
       if (filters.includeRelocatingCandidates) {
-        const preferredLocationConditions = filters.locations.map(() => `jsp.preferredLocations LIKE $${paramIndex++}`);
+        const preferredLocationConditions: string[] = [];
+        filters.locations.forEach(location => {
+          preferredLocationConditions.push(`jsp.preferredLocations LIKE ?`);
+          params.push(`%${location}%`);
+        });
         query += ` AND ((${locationConditions.join(' OR ')}) OR (${preferredLocationConditions.join(' OR ')}))`;
-        filters.locations.forEach(location => {
-          params.push(`%${location}%`);
-        });
-        filters.locations.forEach(location => {
-          params.push(`%${location}%`);
-        });
       } else {
         query += ` AND (${locationConditions.join(' OR ')})`;
-        filters.locations.forEach(location => {
-          params.push(`%${location}%`);
-        });
       }
     }
 
     if (filters.minExperience) {
-      query += ` AND jsp.totalExperience >= $${paramIndex++}`;
+      query += ` AND jsp.totalExperience >= ?`;
       params.push(parseFloat(filters.minExperience));
     }
 
     if (filters.maxExperience) {
-      query += ` AND jsp.totalExperience <= $${paramIndex++}`;
+      query += ` AND jsp.totalExperience <= ?`;
       params.push(parseFloat(filters.maxExperience));
     }
 
     if (filters.selectedGender && filters.selectedGender !== 'All') {
-      query += ` AND jsp.gender = $${paramIndex++}`;
+      query += ` AND jsp.gender = ?`;
       params.push(filters.selectedGender);
     }
 
     if (filters.industryInput) {
-      query += ` AND jsp.currentIndustry LIKE $${paramIndex++}`;
+      query += ` AND jsp.currentIndustry LIKE ?`;
       params.push(`%${filters.industryInput}%`);
     }
 
     if (filters.selectedIndustryType && filters.selectedIndustryType !== 'All Industry Types') {
-      query += ` AND jsp.currentIndustryType = $${paramIndex++}`;
+      query += ` AND jsp.currentIndustryType = ?`;
       params.push(filters.selectedIndustryType);
     }
 
-    // Get total count
+    // Get total count with the same parameters
     const countQuery = `SELECT COUNT(*) as total FROM (${query}) as filtered_candidates`;
     const countResult = db.prepare(countQuery).get(...params) as { total: number };
     const totalCount = countResult.total;
 
     // Add pagination
+    query += ` ORDER BY jsp.updatedAt DESC LIMIT ? OFFSET ?`;
     const offset = (filters.page! - 1) * filters.limit!;
-    query += ` ORDER BY jsp.updatedAt DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
     params.push(filters.limit!, offset);
 
     // Execute query
