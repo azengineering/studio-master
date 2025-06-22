@@ -174,140 +174,44 @@ interface Candidate {
   correspondenceAddress: string; // Added Correspondence Address
 }
 
-let allMockCandidates: Candidate[] = [];
+// API functions to fetch real data from database
+const fetchCandidates = async (filters: any, page: number = 1, limit: number = 25) => {
+  const queryParams = new URLSearchParams({
+    keywords: JSON.stringify(filters.keywords || []),
+    excludedKeywords: JSON.stringify(filters.excludedKeywords || []),
+    skills: JSON.stringify(filters.skills || []),
+    locations: JSON.stringify(filters.locations || []),
+    includeRelocatingCandidates: filters.includeRelocatingCandidates?.toString() || 'false',
+    designationInput: filters.designationInput || '',
+    includedCompanies: JSON.stringify(filters.includedCompanies || []),
+    excludedCompanies: JSON.stringify(filters.excludedCompanies || []),
+    minExperience: filters.minExperience || '',
+    maxExperience: filters.maxExperience || '',
+    minSalary: filters.minSalary || '',
+    maxSalary: filters.maxSalary || '',
+    qualifications: JSON.stringify(filters.qualifications || []),
+    selectedGender: filters.selectedGender || 'All',
+    minAge: filters.minAge || '',
+    maxAge: filters.maxAge || '',
+    industryInput: filters.industryInput || '',
+    selectedIndustryType: filters.selectedIndustryType || 'All Industry Types',
+    page: page.toString(),
+    limit: limit.toString()
+  });
 
-const generateAllMockCandidates = (count: number): Candidate[] => {
-  const candidates: Candidate[] = [];
-  const names = ["Alice Smith", "Bob Johnson", "Charlie Brown", "Diana Miller", "Eve Davis", "Frank White", "Grace Green", "Henry Black", "Ivy Blue", "Jack Red", "Kim Lee", "Liam Green", "Mia Clark", "Noah White", "Olivia Black", "Peter Gray", "Quinn Blue", "Rachel King", "Sam Young", "Tina Hall", "Uma Khan", "Victor Singh", "Wendy Chan", "Xavier Stone", "Yara Diaz", "Zoe Carter"];
-  const designations = ["Software Engineer", "Product Manager", "Data Analyst", "UX Designer", "DevOps Engineer", "Marketing Specialist", "HR Business Partner", "Full Stack Developer", "Backend Engineer", "Frontend Developer", "Cloud Engineer", "Solutions Architect", "Machine Learning Engineer", "Data Scientist", "Business Analyst", "Project Manager", "Scrum Master", "Technical Lead"];
-  const locations = ["Remote", "Bengaluru", "Hyderabad", "Mumbai", "Pune", "New Delhi", "Chennai", "Kolkata", "Ahmedabad", "Gurgaon"];
-  const allSkills = ["React", "Node.js", "Python", "SQL", "AWS", "Azure", "JavaScript", "TypeScript", "UI/UX", "Machine Learning", "Data Visualization", "Agile", "Scrum", "Cloud Computing", "Docker", "Kubernetes", "Git", "Jira", "Figma", "Redux", "Angular", "Vue.js", "Express.js", "Django", "Spring Boot", "C++", "Java", "C#", "Go", "Rust"];
-  const commonQualifications = ['B.Tech', 'B.E.', 'M.Tech', 'MBA', 'PhD', 'B.Sc', 'M.Sc', 'B.Com', 'Diploma'];
-  const commonIndustries = ['Technology', 'Finance', 'Healthcare', 'Education', 'Manufacturing', 'Retail', 'Marketing', 'Automotive', 'Telecom'];
-  const commonGenders = ['Male', 'Female', 'Non-binary'];
-  const companies = ["Tech Innovations", "Global Health Co", "Finance Solutions Inc.", "EduTech Corp", "AutoMakers Ltd", "RetailGiant", "MarketingPro", "CloudWorks", "DataGenius", "ProductLead"];
-  const departments = ["Engineering", "Product", "Data Analytics", "Design", "Operations", "Sales", "HR", "Marketing"];
-
-
-  const imageSizes = ["100x100", "120x120", "150x150"];
-  const getPlaceholderImage = (name: string) => {
-      const size = imageSizes[Math.floor(Math.random() * imageSizes.length)];
-      const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
-      const colors = ['FF0000', '00FF00', '0000FF', 'FFFF00', 'FF00FF', '00FFFF', 'FFA500', '800080'];
-      const bgColor = colors[Math.floor(Math.random() * colors.length)];
-      const textColor = 'FFFFFF';
-      return `https://placehold.co/${size}/${bgColor}/${textColor}?text=${initials}`;
-  };
-
-  for (let i = 0; i < count; i++) {
-    const randomName = names[Math.floor(Math.random() * names.length)];
-    const randomDesignation = designations[Math.floor(Math.random() * designations.length)];
-    const randomExperience = Math.floor(Math.random() * 10) + 1;
-    const randomLocation = locations[Math.floor(Math.random() * locations.length)];
-    const numberOfSkills = Math.floor(Math.random() * 5) + 1;
-    const selectedSkills: string[] = [];
-    while (selectedSkills.length < numberOfSkills) {
-      const skill = allSkills[Math.floor(Math.random() * allSkills.length)];
-      if (!selectedSkills.includes(skill)) selectedSkills.push(skill);
-    }
-    const randomIndustry = commonIndustries[Math.floor(Math.random() * commonIndustries.length)];
-    const numberOfQualifications = Math.floor(Math.random() * 2) + 1;
-    const selectedQualifications: string[] = [];
-    while (selectedQualifications.length < numberOfQualifications) {
-        const qual = commonQualifications[Math.floor(Math.random() * commonQualifications.length)];
-        if (!selectedQualifications.includes(qual)) selectedQualifications.push(qual);
-    }
-    const randomSalaryLPA = parseFloat((Math.random() * (40 - 5) + 5).toFixed(1));
-    const randomGender = commonGenders[Math.floor(Math.random() * commonGenders.length)];
-    const randomAge = Math.floor(Math.random() * (45 - 22 + 1)) + 22;
-
-    const randomProfileImageUrl = getPlaceholderImage(randomName);
-    const randomEmail = `${randomName.toLowerCase().replace(/\s/g, '.')}${i}@example.com`;
-    const randomPhone = `+1-${Math.floor(Math.random() * 900) + 100}-${Math.floor(Math.random() * 9000) + 1000}`;
-    const randomLinkedInUrl = `https://linkedin.com/in/${randomName.toLowerCase().replace(/\s/g, '-')}-${i}`;
-    const randomCompany = companies[Math.floor(Math.random() * companies.length)];
-    const randomDepartment = departments[Math.floor(Math.random() * departments.length)];
-    const numberOfPreferredLocations = Math.floor(Math.random() * 3);
-    const selectedPreferredLocations: string[] = [];
-    while (selectedPreferredLocations.length < numberOfPreferredLocations) {
-      const loc = locations[Math.floor(Math.random() * locations.length)];
-      if (!selectedPreferredLocations.includes(loc) && loc !== randomLocation) {
-        selectedPreferredLocations.push(loc);
-      }
-    }
-
-    // Sample data for new fields
-    const professionalSummary = `Highly motivated ${randomDesignation} with ${randomExperience} years of experience in ${randomIndustry}. Proficient in ${selectedSkills.slice(0, 2).join(' and ')}. Passionate about building scalable solutions and leading innovative projects.`;
-    const workExperience: WorkExperience[] = [
-      {
-        title: randomDesignation,
-        company: randomCompany,
-        startDate: `${2023 - randomExperience}-01`,
-        endDate: 'Present',
-        responsibilities: [
-          `Developed and maintained cutting-edge applications using ${selectedSkills[0]} and ${selectedSkills[1]}.`,
-          `Collaborated with cross-functional teams to deliver high-quality software solutions.`,
-          `Optimized application performance, leading to a 15% improvement in load times.`,
-        ],
-      },
-      {
-        title: `Junior ${randomDesignation}`,
-        company: `Previous ${randomCompany.split(' ')[0]}`,
-        startDate: `${2023 - randomExperience - 2}-03`,
-        endDate: `${2023 - randomExperience}-12`,
-        responsibilities: [
-          `Assisted senior developers in various software development life cycle stages.`,
-          `Participated in code reviews and contributed to documentation.`,
-        ],
-      },
-    ].sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()); // Sort latest first
-
-    const education: Education[] = [
-      {
-        degree: selectedQualifications[0],
-        institution: `University of ${randomLocation.split(' ')[0]}`,
-        year: 2023 - randomExperience - 4,
-      },
-      {
-        degree: 'High School Diploma',
-        institution: 'Local High School',
-        year: 2023 - randomExperience - 8,
-      },
-    ].sort((a, b) => b.year - a.year); // Sort latest first
-
-    const awards = i % 3 === 0 ? [`Employee of the Month (${Math.floor(Math.random() * 12) + 1}/${2023 - Math.floor(Math.random() * 3)})`, 'Innovation Award'] : [];
-    const certifications = i % 2 === 0 ? [`Certified ${selectedSkills[0]} Professional`, `Cloud Practitioner`] : [];
-    // Sample PDF URL - replace with a real PDF URL if available
-    const resumePdfUrl = "https://www.africau.edu/images/default/sample.pdf"; // A publicly accessible sample PDF
-
-    // New personal details
-    const randomDOB = `${Math.floor(Math.random() * (2000 - 1980 + 1)) + 1980}-${String(Math.floor(Math.random() * 12) + 1).padStart(2, '0')}-${String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')}`;
-    const randomMaritalStatus = ['Single', 'Married', 'Divorced', 'Widowed'][Math.floor(Math.random() * 4)];
-    const randomCurrentAddress = `${Math.floor(Math.random() * 100) + 1} ${['Main St', 'Park Ave', 'Oak Ln', 'Elm Rd'][Math.floor(Math.random() * 4)]}, ${locations[Math.floor(Math.random() * locations.length)]}`;
-    const randomCorrespondenceAddress = Math.random() > 0.5 ? randomCurrentAddress : `${Math.floor(Math.random() * 100) + 1} ${['Maple Dr', 'Pine Ct', 'Birch Ave'][Math.floor(Math.random() * 3)]}, ${locations[Math.floor(Math.random() * locations.length)]}`;
-
-
-    candidates.push({
-      id: `candidate-${i + 1}`, name: randomName, designation: randomDesignation, experience: randomExperience,
-      location: randomLocation, skills: selectedSkills, industry: randomIndustry, qualifications: selectedQualifications,
-      salaryLPA: randomSalaryLPA, gender: randomGender, age: randomAge, profileImageUrl: randomProfileImageUrl,
-      email: randomEmail, phone: randomPhone, linkedinProfileUrl: randomLinkedInUrl,
-      company: randomCompany,
-      department: randomDepartment,
-      preferredLocations: selectedPreferredLocations,
-      professionalSummary,
-      workExperience,
-      education,
-      awards,
-      certifications,
-      resumePdfUrl,
-      dob: randomDOB,
-      maritalStatus: randomMaritalStatus,
-      currentAddress: randomCurrentAddress,
-      correspondenceAddress: randomCorrespondenceAddress,
-    });
+  const response = await fetch(`/api/candidates?${queryParams}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch candidates');
   }
-  return candidates;
+  return response.json();
+};
+
+const fetchCandidateDetails = async (candidateId: string) => {
+  const response = await fetch(`/api/candidates/${candidateId}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch candidate details');
+  }
+  return response.json();
 };
 
 // Extracted filter components for better organization and clarity
@@ -700,7 +604,6 @@ const KeySkillsSection: React.FC<KeySkillsSectionProps> = ({ candidate, skills }
 // CandidateDetail Component definition
 interface CandidateDetailProps {
   candidateId: string | null;
-  allCandidates: Candidate[];
   onBack: () => void;
   handleAddSingleToWatchlist: (candidate: Candidate) => void;
   keywords: string[];
@@ -714,22 +617,43 @@ interface CandidateDetailProps {
 }
 
 const CandidateDetail: React.FC<CandidateDetailProps> = React.memo(function CandidateDetail({
-  candidateId, allCandidates, onBack, handleAddSingleToWatchlist,
+  candidateId, onBack, handleAddSingleToWatchlist,
   keywords, designationInput, includedCompanies, locations,
   industryInput, selectedIndustryType, qualifications, skills
 }) {
   const resumePdfRef = useRef<HTMLDivElement>(null);
 
-  const candidate = useMemo(() => {
-    return allCandidates.find(c => c.id === candidateId);
-  }, [candidateId, allCandidates]);
+  const [candidate, setCandidate] = useState<Candidate | null>(null);
+  const [candidateLoading, setCandidateLoading] = useState(false);
+
+  useEffect(() => {
+    if (candidateId) {
+      setCandidateLoading(true);
+      fetchCandidateDetails(candidateId)
+        .then(setCandidate)
+        .catch((error) => {
+          console.error('Error fetching candidate details:', error);
+          setCandidate(null);
+        })
+        .finally(() => setCandidateLoading(false));
+    }
+  }, [candidateId]);
+
+  if (candidateLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full p-8 text-center bg-card rounded-lg shadow-lg min-h-[400px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+        <h2 className="text-xl font-semibold text-primary">Loading candidate details...</h2>
+      </div>
+    );
+  }
 
   if (!candidate) {
     return (
       <div className="flex flex-col items-center justify-center h-full p-8 text-center bg-card rounded-lg shadow-lg min-h-[400px]">
         <XCircle className="h-20 w-20 text-destructive-foreground/40 mb-4" />
         <h2 className="text-2xl font-bold text-destructive">Candidate Not Found</h2>
-        <p className="text-muted-foreground mt-2">The requested candidate details could not be loaded.</p>
+        <p className="text-muted-foreground mt-2">The requested candidate details could not be loaded from the database.</p>
         <Button onClick={onBack} className="mt-6">Back to Search</Button>
       </div>
     );
@@ -1162,9 +1086,7 @@ export default function CandidateSearchUITestPage() {
   const [selectedCandidateIds, setSelectedCandidateIds] = useState<string[]>([]);
   const [isMyWatchlistModalOpen, setIsMyWatchlistModalOpen] = useState(false);
 
-  useEffect(() => {
-    allMockCandidates = generateAllMockCandidates(100);
-  }, []);
+  
 
   useEffect(() => {
     setSavedSearches([
@@ -1182,92 +1104,28 @@ export default function CandidateSearchUITestPage() {
     minAge.trim() !== '' || maxAge.trim() !== ''
   ), [keywords, excludedKeywords, designationInput, includedCompanies, excludedCompanies, skills, locations, minExperience, maxExperience, minSalary, maxSalary, qualifications, selectedIndustryType, selectedGender, minAge, maxAge]);
 
-  const getFilteredCandidates = useCallback(() => {
-    let filtered = [...allMockCandidates];
+  const getCurrentFilters = useCallback(() => ({
+    keywords,
+    excludedKeywords,
+    designationInput,
+    includedCompanies,
+    excludedCompanies,
+    skills,
+    locations,
+    includeRelocatingCandidates,
+    minExperience,
+    maxExperience,
+    minSalary,
+    maxSalary,
+    qualifications,
+    selectedGender,
+    minAge,
+    maxAge,
+    industryInput,
+    selectedIndustryType
+  }), [keywords, excludedKeywords, designationInput, includedCompanies, excludedCompanies, skills, locations, includeRelocatingCandidates, minExperience, maxExperience, minSalary, maxSalary, qualifications, selectedGender, minAge, maxAge, industryInput, selectedIndustryType]);
 
-    if (keywords.length > 0) {
-      filtered = filtered.filter(candidate =>
-        keywords.some(keyword =>
-          candidate.name.toLowerCase().includes(keyword.toLowerCase()) ||
-          candidate.designation.toLowerCase().includes(keyword.toLowerCase()) ||
-          candidate.skills.some(skill => skill.toLowerCase().includes(keyword.toLowerCase()))
-        )
-      );
-    }
-    if (excludedKeywords.length > 0) {
-      filtered = filtered.filter(candidate =>
-        !excludedKeywords.some(excludedKw =>
-          candidate.name.toLowerCase().includes(excludedKw.toLowerCase()) ||
-          candidate.designation.toLowerCase().includes(excludedKw.toLowerCase()) ||
-          candidate.skills.some(skill => skill.toLowerCase().includes(excludedKw.toLowerCase()))
-        )
-      );
-    }
-    if (designationInput) {
-      filtered = filtered.filter(candidate =>
-        candidate.designation.toLowerCase().includes(designationInput.toLowerCase())
-      );
-    }
-    if (includedCompanies.length > 0) {
-      filtered = filtered.filter(candidate =>
-        includedCompanies.some(company =>
-          candidate.company.toLowerCase().includes(company.toLowerCase())
-        )
-      );
-    }
-    if (excludedCompanies.length > 0) {
-      filtered = filtered.filter(candidate =>
-        !excludedCompanies.some(company =>
-          candidate.company.toLowerCase().includes(company.toLowerCase())
-        )
-      );
-    }
-    if (skills.length > 0) {
-      filtered = filtered.filter(candidate =>
-        skills.every(skill =>
-          candidate.skills.some(cs => cs.toLowerCase().includes(skill.toLowerCase()))
-        )
-      );
-    }
-    if (locations.length > 0) {
-      filtered = filtered.filter(candidate =>
-        locations.some(loc => loc.toLowerCase() === candidate.location.toLowerCase()) ||
-        (includeRelocatingCandidates && candidate.preferredLocations.some(pl => pl.toLowerCase().includes(loc.toLowerCase())))
-      );
-    }
-    if (minExperience) {
-      filtered = filtered.filter(candidate => candidate.experience >= parseInt(minExperience));
-    }
-    if (maxExperience) {
-      filtered = filtered.filter(candidate => candidate.experience <= parseInt(maxExperience));
-    }
-    if (minSalary) {
-      filtered = filtered.filter(candidate => candidate.salaryLPA >= parseFloat(minSalary));
-    }
-    if (maxSalary) {
-      filtered = filtered.filter(candidate => candidate.salaryLPA <= parseFloat(maxSalary));
-    }
-    if (qualifications.length > 0) {
-      filtered = filtered.filter(candidate =>
-        qualifications.some(q => candidate.qualifications.includes(q))
-      );
-    }
-    if (selectedIndustryType !== industryTypeOptions[0]) {
-      filtered = filtered.filter(candidate => candidate.industry === selectedIndustryType);
-    }
-    if (selectedGender !== genderOptions[0]) {
-      filtered = filtered.filter(candidate => candidate.gender === selectedGender);
-    }
-    if (minAge) {
-      filtered = filtered.filter(candidate => candidate.age >= parseInt(minAge));
-    }
-    if (maxAge) {
-      filtered = filtered.filter(candidate => candidate.age <= parseInt(maxAge));
-    }
-    return filtered;
-  }, [keywords, excludedKeywords, designationInput, includedCompanies, excludedCompanies, skills, locations, includeRelocatingCandidates, minExperience, maxExperience, minSalary, maxSalary, qualifications, selectedIndustryType, selectedGender, minAge, maxAge]);
-
-  const handleSearchCandidates = useCallback(() => {
+  const handleSearchCandidates = useCallback(async () => {
     setHasUserInitiatedSearch(true);
     setCurrentPage(1);
     setSelectedCandidateIds([]);
@@ -1283,35 +1141,31 @@ export default function CandidateSearchUITestPage() {
     setCandidatesLoading(true);
     setCandidatesError(null);
 
-    const timer = setTimeout(() => {
-        try {
-            const filteredList = getFilteredCandidates();
-            setTotalResultsCount(filteredList.length);
-            const paginatedBatch = filteredList.slice(0, itemsPerPage);
-            setDisplayedCandidates(paginatedBatch);
-        } catch (error: any) {
-            console.error("Error fetching candidates:", error);
-            setCandidatesError("Failed to load candidates.");
-            setDisplayedCandidates([]);
-            setTotalResultsCount(0);
-        } finally {
-            setCandidatesLoading(false);
-        }
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [areFiltersActive, getFilteredCandidates, itemsPerPage]);
+    try {
+        const filters = getCurrentFilters();
+        const result = await fetchCandidates(filters, 1, itemsPerPage);
+        setTotalResultsCount(result.totalCount);
+        setDisplayedCandidates(result.candidates);
+    } catch (error: any) {
+        console.error("Error fetching candidates:", error);
+        setCandidatesError("Failed to load candidates from database.");
+        setDisplayedCandidates([]);
+        setTotalResultsCount(0);
+    } finally {
+        setCandidatesLoading(false);
+    }
+  }, [areFiltersActive, getCurrentFilters, itemsPerPage]);
 
   useEffect(() => {
-    if (hasUserInitiatedSearch) {
+    if (hasUserInitiatedSearch && areFiltersActive()) {
       setCandidatesLoading(true);
       setCandidatesError(null);
-      const timer = setTimeout(() => {
+      
+      const loadPage = async () => {
         try {
-          const filteredList = getFilteredCandidates();
-          const startIndex = (currentPage - 1) * itemsPerPage;
-          const endIndex = startIndex + itemsPerPage;
-          const paginatedBatch = filteredList.slice(startIndex, endIndex);
-          setDisplayedCandidates(paginatedBatch);
+          const filters = getCurrentFilters();
+          const result = await fetchCandidates(filters, currentPage, itemsPerPage);
+          setDisplayedCandidates(result.candidates);
         } catch (error: any) {
           console.error("Error fetching candidates for pagination:", error);
           setCandidatesError("Failed to load more candidates.");
@@ -1319,10 +1173,12 @@ export default function CandidateSearchUITestPage() {
         } finally {
           setCandidatesLoading(false);
         }
-      }, 300);
+      };
+
+      const timer = setTimeout(loadPage, 300);
       return () => clearTimeout(timer);
     }
-  }, [currentPage, hasUserInitiatedSearch, getFilteredCandidates, itemsPerPage]);
+  }, [currentPage, hasUserInitiatedSearch, areFiltersActive, getCurrentFilters, itemsPerPage]);
 
 
   const totalPages = totalResultsCount > 0 ? Math.ceil(totalResultsCount / itemsPerPage) : 0;
@@ -1789,7 +1645,6 @@ export default function CandidateSearchUITestPage() {
               <div className="md:col-span-4 py-0 px-0 bg-background min-h-screen">
                 <CandidateDetail
                   candidateId={selectedCandidateDetailId}
-                  allCandidates={allMockCandidates}
                   onBack={handleBackToSearch}
                   handleAddSingleToWatchlist={handleAddSingleToWatchlist}
                   // Pass filter states for highlighting
