@@ -581,7 +581,7 @@ interface CandidateDetailProps {
   onBack: () => void;
   handleAddSingleToWatchlist: (candidate: Candidate) => void;
   keywords: string[];
-  designationInput:<string>;
+  designationInput: string;
   includedCompanies: string[];
   locations: string[];
   industryInput: string;
