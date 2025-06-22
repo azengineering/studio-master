@@ -110,36 +110,7 @@ const AddRemoveTagsInput: React.FC<AddRemoveTagsInputProps> = ({
   );
 };
 
-const samplePostedJobs = [
-  {
-    id: 'job1', title: 'Senior React Developer (Remote)', description: 'Seeking an experienced React Developer with strong Redux and JavaScript skills. Remote position, 5+ years experience.',
-    filters: {
-      keywords: ['React', 'Redux', 'JavaScript'], skills: ['React', 'Redux', 'JavaScript', 'TypeScript', 'Frontend'], designation: 'Senior React Developer',
-      minExperience: '5', maxExperience: '', locations: ['Remote'], minSalaryLPA: '15', maxSalaryLPA: '25', qualifications: ['B.Tech', 'M.Tech'], industry: 'Technology'
-    }
-  },
-  {
-    id: 'job2', title: 'Cloud Solutions Architect (AWS/Azure)', description: 'Architect and deploy scalable cloud solutions on AWS and Azure platforms. Requires 8+ years in cloud architecture.',
-    filters: {
-      keywords: ['Cloud', 'AWS', 'Azure', 'Solutions Architect'], skills: ['AWS', 'Azure', 'CloudFormation', 'Terraform', 'Kubernetes'], designation: 'Cloud Solutions Architect',
-      minExperience: '8', maxExperience: '', locations: ['Bengaluru', 'Hyderabad'], minSalaryLPA: '30', maxSalaryLPA: '50', qualifications: ['B.E.', 'M.Tech', 'Certification'], industry: 'Technology'
-    }
-  },
-  {
-    id: 'job3', title: 'Data Scientist (Machine Learning)', description: 'Work on advanced machine learning models and data analysis. Python, R, and strong statistical background required.',
-    filters: {
-      keywords: ['Data Science', 'Machine Learning', 'AI', 'Python'], skills: ['Python', 'R', 'SQL', 'Pandas', 'Scikit-learn', 'TensorFlow'], designation: 'Data Scientist',
-      minExperience: '3', maxExperience: '7', locations: ['Mumbai'], minSalaryLPA: '10', maxSalaryLPA: '20', qualifications: ['M.Sc.', 'PhD'], industry: 'Technology'
-    }
-  },
-  {
-    id: 'job4', title: 'Product Manager (SaaS)', description: 'Lead product development for our SaaS platform. Experience with agile methodologies and market analysis is key.',
-    filters: {
-      keywords: ['Product Management', 'SaaS', 'Agile'], skills: ['Product Roadmap', 'Market Analysis', 'Agile', 'Jira', 'UX/UI'], designation: 'Product Manager',
-      minExperience: '6', maxExperience: '', locations: ['Remote', 'Pune'], minSalaryLPA: '20', maxSalaryLPA: '35', qualifications: ['MBA'], industry: 'Technology'
-    }
-  },
-];
+// Posted jobs will be fetched from database
 
 interface WorkExperience {
   title: string;
@@ -903,10 +874,11 @@ const JobDescriptionModal: React.FC<JobDescriptionModalProps> = ({
 interface PostedJobsModalProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  handleFilterByPostedJob: (filters: typeof samplePostedJobs[0]['filters']) => void;
+  handleFilterByPostedJob: (filters: any) => void;
+  postedJobs: any[];
 }
 
-const PostedJobsModal: React.FC<PostedJobsModalProps> = ({ isOpen, onOpenChange, handleFilterByPostedJob }) => (
+const PostedJobsModal: React.FC<PostedJobsModalProps> = ({ isOpen, onOpenChange, handleFilterByPostedJob, postedJobs }) => (
   <Dialog open={isOpen} onOpenChange={onOpenChange}>
     <DialogContent className="sm:max-w-[600px] p-6 rounded-lg shadow-xl">
       <DialogHeader>
@@ -914,18 +886,18 @@ const PostedJobsModal: React.FC<PostedJobsModalProps> = ({ isOpen, onOpenChange,
         <DialogDescription className="text-sm text-muted-foreground">Select a job below to automatically apply its filters and find matching candidates.</DialogDescription>
       </DialogHeader>
       <div className="grid gap-4 py-4">
-        {samplePostedJobs.length === 0 ? (<p className="text-center text-muted-foreground py-8">No posted jobs available at the moment.</p>) : (
+        {postedJobs.length === 0 ? (<p className="text-center text-muted-foreground py-8">No posted jobs available at the moment.</p>) : (
           <ScrollArea className="h-[300px] pr-4">
             <div className="space-y-3">
-              {samplePostedJobs.map((job) => (
+              {postedJobs.map((job) => (
                 <Card key={job.id} className="p-4 hover:shadow-md transition-shadow cursor-pointer border border-border" onClick={() => { handleFilterByPostedJob(job.filters); onOpenChange(false); }}>
                   <CardTitle className="text-lg font-semibold text-primary">{job.title}</CardTitle>
                   <CardDescription className="text-sm text-muted-foreground mt-1">
-                    {job.description.length > 100 ? `${job.description.substring(0, 100)}...` : job.description}
+                    {job.description && job.description.length > 100 ? `${job.description.substring(0, 100)}...` : job.description || 'No description available'}
                   </CardDescription>
                   <div className="mt-2 flex flex-wrap gap-1">
-                    {job.filters.skills?.map(skill => (<Badge key={skill} variant="secondary" className="text-xs py-0.5 px-2">{skill}</Badge>))}
-                    {job.filters.locations?.map(loc => (<Badge key={loc} variant="outline" className="text-xs py-0.5 px-2 border-blue-500/50 text-blue-500 bg-blue-500/10">{loc}</Badge>))}
+                    {job.filters.skills?.map((skill: string) => (<Badge key={skill} variant="secondary" className="text-xs py-0.5 px-2">{skill}</Badge>))}
+                    {job.filters.locations?.map((loc: string) => (<Badge key={loc} variant="outline" className="text-xs py-0.5 px-2 border-blue-500/50 text-blue-500 bg-blue-500/10">{loc}</Badge>))}
                   </div>
                 </Card>
               ))}
@@ -944,31 +916,39 @@ interface SavedSearchesModalProps {
   onOpenChange: (open: boolean) => void;
   savedSearches: any[];
   handleApplySavedSearch: (filters: any) => void;
+  handleDeleteSavedSearch: (searchId: string) => void;
 }
 
-const SavedSearchesModal: React.FC<SavedSearchesModalProps> = ({ isOpen, onOpenChange, savedSearches, handleApplySavedSearch }) => (
+const SavedSearchesModal: React.FC<SavedSearchesModalProps> = ({ isOpen, onOpenChange, savedSearches, handleApplySavedSearch, handleDeleteSavedSearch }) => (
   <Dialog open={isOpen} onOpenChange={onOpenChange}>
     <DialogContent className="sm:max-w-[600px] p-6 rounded-lg shadow-xl">
       <DialogHeader>
         <DialogTitle className="text-2xl font-bold text-primary flex items-center gap-2"><Bookmark className="h-6 w-6 text-green-500" /> My Saved Searches</DialogTitle>
-        <DialogDescription className="text-sm text-muted-foreground">Select a saved search to apply its filters.</DialogDescription>
+        <DialogDescription className="text-sm text-muted-foreground">Select a saved search to apply its filters, or delete searches you no longer need.</DialogDescription>
       </DialogHeader>
       <div className="grid gap-4 py-4">
         {savedSearches.length === 0 ? (<p className="text-center text-muted-foreground py-8">No saved searches yet. Save your current filters!</p>) : (
           <ScrollArea className="h-[300px] pr-4">
             <div className="space-y-3">
               {savedSearches.map((savedSearch) => (
-                <Card key={savedSearch.id} className="p-4 hover:shadow-md transition-shadow cursor-pointer border border-border" onClick={() => { handleApplySavedSearch(savedSearch.filters); onOpenChange(false); }}>
-                  <CardTitle className="text-lg font-semibold text-primary">{savedSearch.name}</CardTitle>
-                  <CardDescription className="text-sm text-muted-foreground mt-1">
-                    Keywords: {savedSearch.filters.keywords?.join(', ') || 'N/A'}
-                    <br/>
-                    Skills: {savedSearch.filters.skills?.join(', ') || 'N/A'}
-                  </CardDescription>
-                  <div className="mt-2 flex flex-wrap gap-1">
-                    {savedSearch.filters.designationInput && <Badge variant="secondary" className="text-xs py-0.5 px-2">{savedSearch.filters.designationInput}</Badge>}
-                    {savedSearch.filters.minExperience && <Badge variant="secondary" className="text-xs py-0.5 px-2">{savedSearch.filters.minExperience}+ Yrs Exp</Badge>}
-                    {savedSearch.filters.locations?.map((loc: string) => (<Badge key={loc} variant="outline" className="text-xs py-0.5 px-2 border-green-500/50 text-green-500 bg-green-500/10">{loc}</Badge>))}
+                <Card key={savedSearch.id} className="p-4 hover:shadow-md transition-shadow border border-border">
+                  <div className="flex justify-between items-start">
+                    <div className="flex-grow cursor-pointer" onClick={() => { handleApplySavedSearch(savedSearch.filters); onOpenChange(false); }}>
+                      <CardTitle className="text-lg font-semibold text-primary">{savedSearch.name}</CardTitle>
+                      <CardDescription className="text-sm text-muted-foreground mt-1">
+                        Keywords: {savedSearch.filters.keywords?.join(', ') || 'N/A'}
+                        <br/>
+                        Skills: {savedSearch.filters.skills?.join(', ') || 'N/A'}
+                      </CardDescription>
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {savedSearch.filters.designationInput && <Badge variant="secondary" className="text-xs py-0.5 px-2">{savedSearch.filters.designationInput}</Badge>}
+                        {savedSearch.filters.minExperience && <Badge variant="secondary" className="text-xs py-0.5 px-2">{savedSearch.filters.minExperience}+ Yrs Exp</Badge>}
+                        {savedSearch.filters.locations?.map((loc: string) => (<Badge key={loc} variant="outline" className="text-xs py-0.5 px-2 border-green-500/50 text-green-500 bg-green-500/10">{loc}</Badge>))}
+                      </div>
+                    </div>
+                    <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive/80 ml-2 shrink-0" onClick={(e) => { e.stopPropagation(); handleDeleteSavedSearch(savedSearch.id); }}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </Card>
               ))}
@@ -1085,15 +1065,42 @@ export default function CandidateSearchUITestPage() {
   const [watchlistCandidates, setWatchlistCandidates] = useState<Candidate[]>([]);
   const [selectedCandidateIds, setSelectedCandidateIds] = useState<string[]>([]);
   const [isMyWatchlistModalOpen, setIsMyWatchlistModalOpen] = useState(false);
+  const [postedJobs, setPostedJobs] = useState<any[]>([]);
+  const [currentUserId] = useState(1); // TODO: Get from auth context
 
   
 
+  // Load data from APIs on component mount
   useEffect(() => {
-    setSavedSearches([
-      {id: 'saved-1', name: 'My Default React Search', filters: {keywords: ['React', 'Frontend'], skills: ['JavaScript', 'React', 'HTML', 'CSS'], designationInput: 'Frontend Developer', minExperience: '2', maxExperience: '5', locations: ['Remote', 'Bangalore'], minSalaryLPA: '8', maxSalaryLPA: '15', industryInput: 'Technology', selectedIndustryType: 'Technology', excludedKeywords: [], includedCompanies: [], excludedCompanies: [], includePreviousDesignations: false, includeRelocatingCandidates: true, qualifications: ['B.Tech'], selectedGender: 'All', minAge: '', maxAge: ''}},
-      {id: 'saved-2', name: 'Data Analyst in Mumbai', filters: {keywords: ['Data Analyst', 'SQL'], skills: ['SQL', 'Excel', 'Data Visualization'], designationInput: 'Data Analyst', minExperience: '1', maxExperience: '3', locations: ['Mumbai'], minSalaryLPA: '5', maxSalaryLPA: '10', industryInput: 'Finance', selectedIndustryType: 'Finance', excludedKeywords: [], includedCompanies: [], excludedCompanies: [], includePreviousDesignations: false, includeRelocatingCandidates: false, qualifications: ['B.Com', 'B.Sc'], selectedGender: 'All', minAge: '', maxAge: ''}}
-    ]);
-  }, []);
+    const loadInitialData = async () => {
+      try {
+        // Load saved searches
+        const savedSearchesResponse = await fetch(`/api/saved-searches?userId=${currentUserId}`);
+        if (savedSearchesResponse.ok) {
+          const { savedSearches: loadedSearches } = await savedSearchesResponse.json();
+          setSavedSearches(loadedSearches);
+        }
+
+        // Load posted jobs
+        const postedJobsResponse = await fetch(`/api/employer/posted-jobs?employerUserId=${currentUserId}`);
+        if (postedJobsResponse.ok) {
+          const { jobs } = await postedJobsResponse.json();
+          setPostedJobs(jobs);
+        }
+
+        // Load watchlist
+        const watchlistResponse = await fetch(`/api/watchlist?employerUserId=${currentUserId}`);
+        if (watchlistResponse.ok) {
+          const { candidates } = await watchlistResponse.json();
+          setWatchlistCandidates(candidates);
+        }
+      } catch (error) {
+        console.error('Error loading initial data:', error);
+      }
+    };
+
+    loadInitialData();
+  }, [currentUserId]);
 
   const areFiltersActive = useCallback(() => (
     keywords.length > 0 || excludedKeywords.length > 0 || designationInput.trim() !== '' ||
@@ -1201,24 +1208,45 @@ export default function CandidateSearchUITestPage() {
     setSelectedCandidateIds([]);
   }, []);
 
-  const handleFilterByPostedJob = useCallback((jobFilters: typeof samplePostedJobs[0]['filters']) => {
+  const handleFilterByPostedJob = useCallback((jobFilters: any) => {
     setKeywords(jobFilters.keywords || []); setSkills(jobFilters.skills || []); setDesignationInput(jobFilters.designation || '');
     setMinExperience(jobFilters.minExperience || ''); setMaxExperience(jobFilters.maxExperience || '');
     setLocations(jobFilters.locations || []); setMinSalary(jobFilters.minSalaryLPA ? String(jobFilters.minSalaryLPA) : '');
     setMaxSalary(jobFilters.maxSalaryLPA ? String(jobFilters.maxSalaryLPA) : '');
     setQualifications(jobFilters.qualifications || []); setIndustryInput(jobFilters.industry || '');
     setIsPostedJobsModalOpen(false);
-    handleSearchCandidates();
+    setTimeout(() => handleSearchCandidates(), 100);
   }, [handleSearchCandidates]);
 
-  const handleSaveSearch = useCallback(() => {
+  const handleSaveSearch = useCallback(async () => {
     const searchName = prompt("Enter a name for this saved search:");
     if (!searchName?.trim()) return;
+    
     const currentFilters = {keywords, excludedKeywords, designationInput, includePreviousDesignations, includedCompanies, excludedCompanies, skills, locations, includeRelocatingCandidates, industryInput, selectedIndustryType, minExperience, maxExperience, minSalary, maxSalary, qualifications, selectedGender, minAge, maxAge};
-    const newSavedSearch = {id: `saved-${Date.now()}`, name: searchName.trim(), filters: currentFilters};
-    setSavedSearches(prev => (prev.length >= 10 ? prev.slice(prev.length - 9) : prev).concat(newSavedSearch));
-    console.log("Saved search:", newSavedSearch);
-  }, [keywords, excludedKeywords, designationInput, includePreviousDesignations, includedCompanies, excludedCompanies, skills, locations, includeRelocatingCandidates, industryInput, selectedIndustryType, minExperience, maxExperience, minSalary, maxSalary, qualifications, selectedGender, minAge, maxAge]);
+    
+    try {
+      const response = await fetch('/api/saved-searches', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: currentUserId,
+          name: searchName.trim(),
+          filters: currentFilters
+        })
+      });
+
+      if (response.ok) {
+        const { savedSearch } = await response.json();
+        setSavedSearches(prev => [...prev, savedSearch]);
+        alert("Search saved successfully!");
+      } else {
+        alert("Failed to save search. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error saving search:", error);
+      alert("Failed to save search. Please try again.");
+    }
+  }, [keywords, excludedKeywords, designationInput, includePreviousDesignations, includedCompanies, excludedCompanies, skills, locations, includeRelocatingCandidates, industryInput, selectedIndustryType, minExperience, maxExperience, minSalary, maxSalary, qualifications, selectedGender, minAge, maxAge, currentUserId]);
 
   const handleApplySavedSearch = useCallback((savedFilterSet: any) => {
     setKeywords(savedFilterSet.keywords || []); setExcludedKeywords(savedFilterSet.excludedKeywords || []);
@@ -1232,8 +1260,28 @@ export default function CandidateSearchUITestPage() {
     setSelectedGender(savedFilterSet.selectedGender || genderOptions[0]); setMinAge(savedFilterSet.minAge || '');
     setMaxAge(savedFilterSet.maxAge || '');
     setIsSavedSearchesModalOpen(false);
-    handleSearchCandidates();
+    setTimeout(() => handleSearchCandidates(), 100);
   }, [handleSearchCandidates]);
+
+  const handleDeleteSavedSearch = useCallback(async (searchId: string) => {
+    if (!confirm("Are you sure you want to delete this saved search?")) return;
+    
+    try {
+      const response = await fetch(`/api/saved-searches?id=${searchId}&userId=${currentUserId}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        setSavedSearches(prev => prev.filter(search => search.id !== searchId));
+        alert("Saved search deleted successfully!");
+      } else {
+        alert("Failed to delete saved search.");
+      }
+    } catch (error) {
+      console.error("Error deleting saved search:", error);
+      alert("Failed to delete saved search.");
+    }
+  }, [currentUserId]);
 
   const handleGenerateFiltersFromJD = useCallback(async () => {
     if (!jobDescriptionText.trim()) { setLlmGenerationError("Please paste a job description to generate filters."); return; }
@@ -1302,21 +1350,48 @@ export default function CandidateSearchUITestPage() {
     setSelectedCandidateIds([]);
   }, [selectedCandidateIds, displayedCandidates]);
 
-  const handleAddSingleToWatchlist = useCallback((candidate: Candidate) => {
-    setWatchlistCandidates(prev => {
-      if (!prev.some(c => c.id === candidate.id)) {
-        alert(`${candidate.name} added to watchlist.`);
-        return [...prev, candidate];
-      }
-      alert(`${candidate.name} is already in your watchlist.`);
-      return prev;
-    });
-  }, []);
+  const handleAddSingleToWatchlist = useCallback(async (candidate: Candidate) => {
+    try {
+      const response = await fetch('/api/watchlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          employerUserId: currentUserId,
+          candidateId: candidate.id
+        })
+      });
 
-  const handleRemoveFromWatchlist = useCallback((candidateId: string) => {
-    setWatchlistCandidates(prev => prev.filter(candidate => candidate.id !== candidateId));
-    alert("Candidate removed from watchlist.");
-  }, []);
+      if (response.ok) {
+        setWatchlistCandidates(prev => [...prev, candidate]);
+        alert(`${candidate.name} added to watchlist.`);
+      } else if (response.status === 409) {
+        alert(`${candidate.name} is already in your watchlist.`);
+      } else {
+        alert("Failed to add candidate to watchlist.");
+      }
+    } catch (error) {
+      console.error("Error adding to watchlist:", error);
+      alert("Failed to add candidate to watchlist.");
+    }
+  }, [currentUserId]);
+
+  const handleRemoveFromWatchlist = useCallback(async (candidateId: string) => {
+    try {
+      const response = await fetch(`/api/watchlist?employerUserId=${currentUserId}&candidateId=${candidateId}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        setWatchlistCandidates(prev => prev.filter(candidate => candidate.id !== candidateId));
+        alert("Candidate removed from watchlist.");
+      } else {
+        alert("Failed to remove candidate from watchlist.");
+      }
+    } catch (error) {
+      console.error("Error removing from watchlist:", error);
+      alert("Failed to remove candidate from watchlist.");
+    }
+  }, [currentUserId]);
 
   const handleSelectCandidate = useCallback((candidateId: string) => {
     setSelectedCandidateIds(prev =>
@@ -1677,6 +1752,7 @@ export default function CandidateSearchUITestPage() {
         isOpen={isPostedJobsModalOpen}
         onOpenChange={setIsPostedJobsModalOpen}
         handleFilterByPostedJob={handleFilterByPostedJob}
+        postedJobs={postedJobs}
       />
 
       <SavedSearchesModal
@@ -1684,6 +1760,7 @@ export default function CandidateSearchUITestPage() {
         onOpenChange={setIsSavedSearchesModalOpen}
         savedSearches={savedSearches}
         handleApplySavedSearch={handleApplySavedSearch}
+        handleDeleteSavedSearch={handleDeleteSavedSearch}
       />
 
       <MyWatchlistModal
