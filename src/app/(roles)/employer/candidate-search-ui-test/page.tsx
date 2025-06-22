@@ -660,12 +660,12 @@ const CandidateDetail: React.FC<CandidateDetailProps> = React.memo(function Cand
   }
 
   const handleResumeClick = useCallback(() => {
-    if (candidate.resumePdfUrl && resumePdfRef.current) {
+    if (candidate?.resumePdfUrl && resumePdfRef.current) {
         resumePdfRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } else {
-        console.log(`No resume/CV available for ${candidate.name}`);
+        console.log(`No resume/CV available for ${candidate?.name || 'Unknown'}`);
     }
-  }, [candidate.resumePdfUrl, candidate.name]);
+  }, [candidate?.resumePdfUrl, candidate?.name]);
 
 
   return (
