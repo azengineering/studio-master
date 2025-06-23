@@ -201,7 +201,7 @@ const KeywordsFilter: React.FC<KeywordsFilterProps> = ({
 }) => (
   <>
     <AddRemoveTagsInput label="Search Keywords" placeholder="e.g., Java, Project Manager" currentInputValue={currentKeywordInput} setCurrentInputValue={setCurrentKeywordInput} items={keywords} setItems={setKeywords} maxItems={15} inputRef={keywordInputRef} />
-    <AddRemoveTagsInput label="Exclude Keywords" placeholder="e.g., Junior, Intern" currentInputValue={currentExcludeKeywordInput} setCurrentExcludeKeywordInput={setCurrentExcludeKeywordInput} items={excludedKeywords} setItems={setExcludedKeywords} maxItems={10} badgeVariant="destructive" inputRef={excludeKeywordInputRef} />
+    <AddRemoveTagsInput label="Exclude Keywords" placeholder="e.g., Junior, Intern" currentInputValue={currentExcludeKeywordInput} setCurrentInputValue={setCurrentExcludeKeywordInput} items={excludedKeywords} setItems={setExcludedKeywords} maxItems={10} badgeVariant="destructive" inputRef={excludeKeywordInputRef} />
     <div className="flex flex-col sm:flex-row items-start sm:items-end gap-2">
       <div className="w-full sm:w-1/2">
         <Label htmlFor="industry-input" className="text-sm font-medium text-foreground">Industry</Label>
@@ -239,7 +239,7 @@ const SkillsAndLocationsFilter: React.FC<SkillsAndLocationsFilterProps> = ({
     <AddRemoveTagsInput label="Skills" placeholder="e.g., Python, React" currentInputValue={currentSkillInput} setCurrentInputValue={setCurrentSkillInput} items={skills} setItems={setSkills} maxItems={15} inputRef={skillInputRef} />
     <Separator />
     <div>
-      <AddRemoveTagsInput label="Current Locations" placeholder="City, State or Remote" currentInputValue={currentLocationInput} setCurrentLocationInput={setCurrentLocationInput} items={locations} setItems={setLocations} maxItems={5} inputRef={locationInputRef} />
+      <AddRemoveTagsInput label="Current Locations" placeholder="City, State or Remote" currentInputValue={currentLocationInput} setCurrentInputValue={setCurrentLocationInput} items={locations} setItems={setLocations} maxItems={5} inputRef={locationInputRef} />
       <div className="flex items-center space-x-2 mt-2.5">
         <Checkbox id="include-relocating" checked={includeRelocatingCandidates} onCheckedChange={(checked) => setIncludeRelocatingCandidates(!!checked)} />
         <Label htmlFor="include-relocating" className="text-xs font-normal text-muted-foreground cursor-pointer">
@@ -1066,7 +1066,7 @@ export default function CandidateSearchUITestPage() {
   const [candidatesError, setCandidatesError] = useState<string | null>(null);
   const [displayedCandidates, setDisplayedCandidates] = useState<Candidate[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 25;
+  const [itemsPerPage] = useState(25);
   const [hasUserInitiatedSearch, setHasUserInitiatedSearch] = useState(false);
   const [watchlistCandidates, setWatchlistCandidates] = useState<Candidate[]>([]);
   const [selectedCandidateIds, setSelectedCandidateIds] = useState<string[]>([]);
@@ -1079,7 +1079,7 @@ export default function CandidateSearchUITestPage() {
     const checkAuthentication = () => {
       // Check if user is authenticated (you can modify this logic based on your auth implementation)
       const isLoggedIn = typeof window !== 'undefined' && localStorage.getItem('isAuthenticated') === 'true';
-      
+
       if (!isLoggedIn) {
         setIsAuthModalOpen(true);
         setIsAuthenticated(false);
@@ -1196,7 +1196,7 @@ export default function CandidateSearchUITestPage() {
     if (hasUserInitiatedSearch && areFiltersActive()) {
       setCandidatesLoading(true);
       setCandidatesError(null);
-      
+
       const loadPage = async () => {
         try {
           const filters = getCurrentFilters();
@@ -1250,9 +1250,9 @@ export default function CandidateSearchUITestPage() {
   const handleSaveSearch = useCallback(async () => {
     const searchName = prompt("Enter a name for this saved search:");
     if (!searchName?.trim()) return;
-    
+
     const currentFilters = {keywords, excludedKeywords, designationInput, includePreviousDesignations, includedCompanies, excludedCompanies, skills, locations, includeRelocatingCandidates, industryInput, selectedIndustryType, minExperience, maxExperience, minSalary, maxSalary, qualifications, selectedGender, minAge, maxAge};
-    
+
     try {
       const response = await fetch('/api/saved-searches', {
         method: 'POST',
@@ -1294,7 +1294,7 @@ export default function CandidateSearchUITestPage() {
 
   const handleDeleteSavedSearch = useCallback(async (searchId: string) => {
     if (!confirm("Are you sure you want to delete this saved search?")) return;
-    
+
     try {
       const response = await fetch(`/api/saved-searches?id=${searchId}&userId=${currentUserId}`, {
         method: 'DELETE'
@@ -1495,7 +1495,7 @@ export default function CandidateSearchUITestPage() {
                     <ScrollArea className="h-full md:max-h-[calc(100vh-250px)] [&::-webkit-scrollbar]:!w-2 [&::-webkit-scrollbar-track]:!bg-transparent [&::-webkit-scrollbar-thumb]:!bg-gray-700 [&::-webkit-scrollbar-thumb]:!rounded-full">
                       <CardContent className="p-4 space-y-5">
                         <AddRemoveTagsInput label="Search Keywords" placeholder="e.g., Java, Project Manager" currentInputValue={currentKeywordInput} setCurrentInputValue={setCurrentKeywordInput} items={keywords} setItems={setKeywords} maxItems={15} inputRef={keywordInputRef} />
-                        <AddRemoveTagsInput label="Exclude Keywords" placeholder="e.g., Junior, Intern" currentInputValue={currentExcludeKeywordInput} setCurrentExcludeKeywordInput={setCurrentExcludeKeywordInput} items={excludedKeywords} setItems={setExcludedKeywords} maxItems={10} badgeVariant="destructive" inputRef={excludeKeywordInputRef} />
+                        <AddRemoveTagsInput label="Exclude Keywords" placeholder="e.g., Junior, Intern" currentInputValue={currentExcludeKeywordInput} setCurrentInputValue={setCurrentExcludeKeywordInput} items={excludedKeywords} setItems={setExcludedKeywords} maxItems={10} badgeVariant="destructive" inputRef={excludeKeywordInputRef} />
                         <div className="flex flex-col sm:flex-row items-start sm:items-end gap-2">
                           <div className="w-full sm:w-1/2">
                             <Label htmlFor="industry-input" className="text-sm font-medium text-foreground">Industry</Label>
@@ -1517,7 +1517,7 @@ export default function CandidateSearchUITestPage() {
                         <AddRemoveTagsInput label="Skills" placeholder="e.g., Python, React" currentInputValue={currentSkillInput} setCurrentInputValue={setCurrentSkillInput} items={skills} setItems={setSkills} maxItems={15} inputRef={skillInputRef} />
                         <Separator />
                         <div>
-                          <AddRemoveTagsInput label="Current Locations" placeholder="City, State or Remote" currentInputValue={currentLocationInput} setCurrentLocationInput={setCurrentLocationInput} items={locations} setItems={setLocations} maxItems={5} inputRef={locationInputRef} />
+                          <AddRemoveTagsInput label="Current Locations" placeholder="City, State or Remote" currentInputValue={currentLocationInput} setCurrentInputValue={setCurrentLocationInput} items={locations} setItems={setLocations} maxItems={5} inputRef={locationInputRef} />
                           <div className="flex items-center space-x-2 mt-2.5">
                             <Checkbox id="include-relocating" checked={includeRelocatingCandidates} onCheckedChange={(checked) => setIncludeRelocatingCandidates(!!checked)} />
                             <Label htmlFor="include-relocating" className="text-xs font-normal text-muted-foreground cursor-pointer">Include candidates who prefer to relocate to above locations</Label>
@@ -1706,7 +1706,7 @@ export default function CandidateSearchUITestPage() {
                                                                   <Phone className="h-4 w-4" />
                                                               </Button>
                                                           </PopoverTrigger>
-                           
+
                                                           <PopoverContent className="w-auto p-2 flex flex-col items-start gap-1">
                                                               <span className="text-sm font-medium">{candidate.phone}</span>
                                                               <div className="flex gap-2 mt-1">
