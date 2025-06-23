@@ -1,3 +1,4 @@
+typescript
 'use client';
 
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
@@ -582,7 +583,7 @@ interface CandidateDetailProps {
   designationInput: string;
   includedCompanies: string[];
   locations: string[];
-  industryInput: string;
+  industryInput: string```tool_code
   selectedIndustryType: string;
   qualifications: string[];
   skills: string[];
@@ -707,7 +708,7 @@ const CandidateDetail: React.FC<CandidateDetailProps> = React.memo(function Cand
                       <span className="ml-2 font-semibold text-gray-800">
                           {highlightText(candidate.designation, [designationInput, ...keywords])} {candidate.department && `(${candidate.department})`}
                       </span>
-                      {candidate.company && <span className="text-gray-600"> @ {highlightText(candidate.company, includedCompanies)}</span>}
+                      {candidate.company && <span className="text-blue-600 font-bold"> @ {highlightText(candidate.company, includedCompanies)}</span>}
                   </span>
               </p>
 
@@ -998,7 +999,7 @@ const MyWatchlistModal: React.FC<MyWatchlistModalProps> = ({ isOpen, onOpenChang
                               <span className="ml-2 font-medium text-gray-800">
                                   {candidate.designation} {candidate.department && `(${candidate.department})`}
                               </span>
-                              {candidate.company && <span className="text-gray-600"> @ {candidate.company}</span>}
+                              {candidate.company && <span className="text-blue-600 font-bold"> @ {candidate.company}</span>}
                           </span>
                       </div>
                       <div className="mt-2 text-sm text-gray-700 flex flex-wrap items-center gap-x-4 gap-y-1">
@@ -1495,7 +1496,7 @@ export default function CandidateSearchUITestPage() {
                     <ScrollArea className="h-full md:max-h-[calc(100vh-250px)] [&::-webkit-scrollbar]:!w-2 [&::-webkit-scrollbar-track]:!bg-transparent [&::-webkit-scrollbar-thumb]:!bg-gray-700 [&::-webkit-scrollbar-thumb]:!rounded-full">
                       <CardContent className="p-4 space-y-5">
                         <AddRemoveTagsInput label="Search Keywords" placeholder="e.g., Java, Project Manager" currentInputValue={currentKeywordInput} setCurrentInputValue={setCurrentKeywordInput} items={keywords} setItems={setKeywords} maxItems={15} inputRef={keywordInputRef} />
-                        <AddRemoveTagsInput label="Exclude Keywords" placeholder="e.g., Junior, Intern" currentInputValue={currentExcludeKeywordInput} setCurrentInputValue={setCurrentExcludeKeywordInput} items={excludedKeywords} setItems={setExcludedKeywords} maxItems={10} badgeVariant="destructive" inputRef={excludeKeywordInputRef} />
+                        <AddRemoveTagsInput label="Exclude Keywords" placeholder="e.g., Junior, Intern" currentInputValue={currentExcludeKeywordInput} setCurrentInputValue={currentExcludeKeywordInput} items={excludedKeywords} setItems={setExcludedKeywords} maxItems={10} badgeVariant="destructive" inputRef={excludeKeywordInputRef} />
                         <div className="flex flex-col sm:flex-row items-start sm:items-end gap-2">
                           <div className="w-full sm:w-1/2">
                             <Label htmlFor="industry-input" className="text-sm font-medium text-foreground">Industry</Label>
@@ -1685,7 +1686,7 @@ export default function CandidateSearchUITestPage() {
                                                               <span className="ml-2 font-medium text-gray-800">
                                                                   {highlightText(candidate.designation, [designationInput, ...keywords])} {candidate.department && `(${candidate.department})`}
                                                               </span>
-                                                              {candidate.company && <span className="text-gray-600"> @ {highlightText(candidate.company, includedCompanies)}</span>}
+                                                              {candidate.company && <span className="text-blue-600 font-bold"> @ {highlightText(candidate.company, includedCompanies)}</span>}
                                                           </span>
                                                       </div>
                                                   </div>

@@ -100,11 +100,22 @@ export async function GET(
     }
 
     // Parse skills
-    const skills = candidate.skills ? candidate.skills.split(',').map((s: string) => s.trim()).filter(Boolean) : [];
+    let skills: string[] = [];
+    if (candidate.skills) {
+      const skillsStr = candidate.skills.toString();
+      // Remove brackets and quotes, then split
+      const cleanStr = skillsStr.replace(/[\[\]"']/g, '').trim();
+      skills = cleanStr.split(',').map((s: string) => s.trim()).filter(Boolean);
+    }
 
     // Parse preferred locations
-    const preferredLocations = candidate.preferredLocations ? 
-      candidate.preferredLocations.split(',').map((s: string) => s.trim()).filter(Boolean) : [];
+    let preferredLocations: string[] = [];
+    if (candidate.preferredLocations) {
+      const locStr = candidate.preferredLocations.toString();
+      // Remove brackets and quotes, then split
+      const cleanStr = locStr.replace(/[\[\]"']/g, '').trim();
+      preferredLocations = cleanStr.split(',').map((s: string) => s.trim()).filter(Boolean);
+    }
 
     // Get qualifications from education
     const qualifications = education.map((ed: any) => ed.degree);
@@ -117,6 +128,7 @@ export async function GET(
       location: candidate.location || 'Not specified',
       skills,
       industry: candidate.industry || 'Not specified',
+      industryType: candidate.industryType || 'Not specified',
       qualifications,
       salaryLPA,
       gender: candidate.gender || 'Not specified',

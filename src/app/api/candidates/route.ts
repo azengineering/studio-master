@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 
@@ -28,7 +27,7 @@ interface CandidateFilters {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    
+
     const filters: CandidateFilters = {
       keywords: searchParams.get('keywords') ? JSON.parse(searchParams.get('keywords')!) : [],
       excludedKeywords: searchParams.get('excludedKeywords') ? JSON.parse(searchParams.get('excludedKeywords')!) : [],
@@ -121,7 +120,7 @@ export async function GET(request: NextRequest) {
         locationConditions.push(`jsp.currentCity LIKE ?`);
         params.push(`%${location}%`);
       });
-      
+
       if (filters.includeRelocatingCandidates) {
         const preferredLocationConditions: string[] = [];
         filters.locations.forEach(location => {
@@ -196,11 +195,20 @@ export async function GET(request: NextRequest) {
       }
 
       // Parse skills
-      const skills = candidate.skills ? candidate.skills.split(',').map((s: string) => s.trim()).filter(Boolean) : [];
+      let skills: string[] = [];
+      if (candidate.skills) {
+        const skillsStr = candidate.skills.toString();
+        const cleanStr = skillsStr.replace(/[\[\]"']/g, '').trim();
+        skills = cleanStr.split(',').map((s: string) => s.trim()).filter(Boolean);
+      }
 
-      // Parse preferred locations
-      const preferredLocations = candidate.preferredLocations ? 
-        candidate.preferredLocations.split(',').map((s: string) => s.trim()).filter(Boolean) : [];
+      // Parse preferred locations  
+      let preferredLocations: string[] = [];
+      if (candidate.preferredLocations) {
+        const locStr = candidate.preferredLocations.toString();
+        const cleanStr = locStr.replace(/[\[\]"']/g, '').trim();
+        preferredLocations = cleanStr.split(',').map((s: string) => s.trim()).filter(Boolean);
+      }
 
       // Get qualifications from education (we'll need to fetch this separately)
       const qualifications = ['B.Tech']; // Default for now
