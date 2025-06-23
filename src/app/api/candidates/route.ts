@@ -159,16 +159,6 @@ export async function GET(request: NextRequest) {
       params.push(filters.selectedIndustryType);
     }
 
-    if (filters.minSalary) {
-      query += ` AND CAST(REPLACE(REPLACE(jsp.presentSalary, ' LPA', ''), ' ', '') AS REAL) >= ?`;
-      params.push(parseFloat(filters.minSalary));
-    }
-
-    if (filters.maxSalary) {
-      query += ` AND CAST(REPLACE(REPLACE(jsp.presentSalary, ' LPA', ''), ' ', '') AS REAL) <= ?`;
-      params.push(parseFloat(filters.maxSalary));
-    }
-
     // Get total count with the same parameters
     const countQuery = `SELECT COUNT(*) as total FROM (${query}) as filtered_candidates`;
     const countResult = db.prepare(countQuery).get(...params) as { total: number };
