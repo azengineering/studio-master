@@ -1340,7 +1340,7 @@ export default function CandidateSearchUITestPage() {
           responseMimeType: "application/json",
           responseSchema: {
             type: "OBJECT",
-            properties: {"keywords": { "type": "ARRAY", "items": { "type": "STRING" } },"skills": { "type": "ARRAY", "items": { "type": "STRING" } },"designation": { "type": "STRING", "nullable": true },"minExperience": { "type": "INTEGER", "nullable": true },"maxExperience": { "type": "INTEGER", "nullable": true },"minSalaryLPA": { "type": "NUMBER", "nullable": true },"maxSalaryLPA": { "type": "NUMBER", "nullable": true },"qualifications": { "type": "ARRAY", "items": { "type": "STRING" } },"industry": { "type": "STRING", "nullable": true }},
+            properties: {"keywords": { "type": "ARRAY", "items": { "type": "STRING" } },"skills": { "type": "ARRAY", "items": { "type": "STRING" } },"designation": { "type": "STRING", "nullable": true },"minExperience": { "type": "INTEGER", "nullable": true },"maxExperience": { "type": "INTEGER", "nullable": true },"minSalaryLPA": { "type": "NUMBER", "nullable": true },"maxSalaryLPA": { "type": "NUMBER", "nullable": true },"qualifications": { " type": "ARRAY", "items": { "type": "STRING" } },"industry": { "type": "STRING", "nullable": true }},
             propertyOrdering: ["keywords", "skills", "designation", "minExperience", "maxExperience", "minSalaryLPA", "maxSalaryLPA", "qualifications", "industry"]
           }
         }
@@ -1572,8 +1572,8 @@ export default function CandidateSearchUITestPage() {
                                   <Label htmlFor="include-previous-designations" className="text-xs font-normal text-muted-foreground cursor-pointer">Include Previous Designations</Label>
                                 </div>
                               </div>
-                              <AddRemoveTagsInput label="Include Companies" placeholder="Company name" currentInputValue={currentIncludeCompanyInput} setCurrentInputValue={setCurrentIncludeCompanyInput} items={includedCompanies} setItems={setIncludedCompanies} maxItems={5} inputRef={includeCompanyInputRef} tooltipPlacement="top" />
-                              <AddRemoveTagsInput label="Exclude Companies" placeholder="Company name" currentInputValue={currentExcludeCompanyInput} setCurrentInputValue={setCurrentExcludeCompanyInput} items={excludedCompanies} setItems={setExcludedCompanies} maxItems={5} badgeVariant="destructive" inputRef={excludeCompanyInputRef} tooltipPlacement="top" />
+                              <AddRemoveTagsInput label="Include Companies" placeholder="Company name" currentInputValue={currentIncludeCompanyInput} setCurrentInputValue={currentIncludeCompanyInput} items={includedCompanies} setItems={setIncludedCompanies} maxItems={5} inputRef={includeCompanyInputRef} tooltipPlacement="top" />
+                              <AddRemoveTagsInput label="Exclude Companies" placeholder="Company name" currentInputValue={currentExcludeCompanyInput} setCurrentInputValue={currentExcludeCompanyInput} items={excludedCompanies} setItems={setExcludedCompanies} maxItems={5} badgeVariant="destructive" inputRef={excludeCompanyInputRef} tooltipPlacement="top" />
                             </div>
                           )}
                         </div>
@@ -1641,7 +1641,7 @@ export default function CandidateSearchUITestPage() {
 
                     {hasUserInitiatedSearch && (displayedCandidates.length > 0 || candidatesLoading) && (
                         <div className="flex items-center gap-2 ml-auto text-sm text-muted-foreground">
-                            <Button variant="outline" size="sm" onClick={handlePrevPage} disabled={currentPage === 1 || candidatesLoading} className="h-8 w-8 p-0"><ChevronLeft className="h-4 w-4" /></Button>
+                            <Button variant="outline" size="sm" onClick={handlePrevPage} disabled={currentPage === 1 || candidatesLoading}className="h-8 w-8 p-0"><ChevronLeft className="h-4 w-4" /></Button>
                             <span>Page {currentPage} of {totalPages}</span>
                             <Button variant="outline" size="sm" onClick={handleNextPage} disabled={currentPage >= totalPages || candidatesLoading} className="h-8 w-8 p-0"><ChevronRight className="h-4 w-4" /></Button>
                         </div>
