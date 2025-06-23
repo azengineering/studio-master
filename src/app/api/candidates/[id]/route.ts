@@ -52,9 +52,7 @@ export async function GET(
         qualification as degree,
         stream,
         institution,
-        yearOfCompletion as year,
-        percentage,
-        cgpa
+        yearOfCompletion as year
       FROM education_details ed
       JOIN job_seeker_profiles jsp ON ed.job_seeker_profile_id = jsp.id
       WHERE jsp.user_id = ?

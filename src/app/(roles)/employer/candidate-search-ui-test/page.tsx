@@ -492,12 +492,6 @@ const EducationalDetails: React.FC<EducationalDetailsProps> = ({ candidate, qual
                             <div className="space-y-1 text-sm text-gray-700">
                                 <p><strong>Institution:</strong> {edu.institution}</p>
                                 <p><strong>Passing Year:</strong> {edu.year}</p>
-                                {edu.percentage && (
-                                    <p><strong>Percentage:</strong> {edu.percentage}%</p>
-                                )}
-                                {edu.cgpa && (
-                                    <p><strong>CGPA:</strong> {edu.cgpa}</p>
-                                )}
                             </div>
                         </Card>
                     ))}
