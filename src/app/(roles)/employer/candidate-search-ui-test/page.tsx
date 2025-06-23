@@ -585,6 +585,7 @@ interface CandidateDetailProps {
   industryInput: string;
   selectedIndustryType: string;
   qualifications: string[];
+```text
   skills: string[];
 }
 
@@ -1524,20 +1525,38 @@ export default function CandidateSearchUITestPage() {
                           </div>
                         </div>
                         <Separator />
+                         {/* Salary Filter */}
+                         <div>
+                            <Label className="text-sm font-medium text-foreground">Salary (LPA)</Label>
+                            <div className="flex items-center gap-2 mt-1">
+                                <Input
+                                    id="min-salary"
+                                    type="number"
+                                    placeholder="Min"
+                                    className="h-9 text-sm"
+                                    aria-label="Minimum annual salary in lakhs per annum"
+                                    value={minSalary}
+                                    onChange={(e) => setMinSalary(e.target.value)}
+                                />
+                                <span className="text-muted-foreground">-</span>
+                                <Input
+                                    id="max-salary"
+                                    type="number"
+                                    placeholder="Max"
+                                    className="h-9 text-sm"
+                                    aria-label="Maximum annual salary in lakhs per annum"
+                                    value={maxSalary}
+                                    onChange={(e) => setMaxSalary(e.target.value)}
+                                />
+                            </div>
+                        </div>
+                        {/* Experience and Employment Details Filter */}
                         <div>
                           <Label className="text-sm font-medium text-foreground">Experience (Years)</Label>
                           <div className="flex items-center gap-2 mt-1">
                             <Input id="min-exp" type="number" placeholder="Min" className="h-9 text-sm" aria-label="Minimum experience in years" value={minExperience} onChange={(e) => setMinExperience(e.target.value)} />
                             <span className="text-muted-foreground">-</span>
                             <Input id="max-exp" type="number" placeholder="Max" className="h-9 text-sm" aria-label="Maximum experience in years" value={maxExperience} onChange={(e) => setMaxExperience(e.target.value)} />
-                          </div>
-                        </div>
-                        <div>
-                          <Label className="text-sm font-medium text-foreground flex items-center gap-1">Salary</Label>
-                          <div className="flex items-center gap-2 mt-1">
-                            <Input id="min-salary" type="number" placeholder="Min (LPA)" className="h-9 text-sm" aria-label="Minimum annual salary in lakhs per annum" value={minSalary} onChange={(e) => setMinSalary(e.target.value)} />
-                            <span className="text-muted-foreground">-</span>
-                            <Input id="max-salary" type="number" placeholder="Max (LPA)" className="h-9 text-sm" aria-label="Maximum annual salary in lakhs per annum" value={maxSalary} onChange={(e) => setMaxSalary(e.target.value)} />
                           </div>
                         </div>
                         <Separator />
