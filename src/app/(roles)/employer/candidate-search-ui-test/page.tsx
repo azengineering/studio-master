@@ -1137,8 +1137,8 @@ export default function CandidateSearchUITestPage() {
     locations.length > 0 || minExperience.trim() !== '' || maxExperience.trim() !== '' ||
     minSalary.trim() !== '' || maxSalary.trim() !== '' || qualifications.length > 0 ||
     selectedIndustryType !== industryTypeOptions[0] || selectedGender !== genderOptions[0] ||
-    minAge.trim() !== '' || maxAge.trim() !== ''
-  ), [keywords, excludedKeywords, designationInput, includedCompanies, excludedCompanies, skills, locations, minExperience, maxExperience, minSalary, maxSalary, qualifications, selectedIndustryType, selectedGender, minAge, maxAge]);
+    minAge.trim() !== '' || maxAge.trim() !== '' || industryInput.trim() !== ''
+  ), [keywords, excludedKeywords, designationInput, includedCompanies, excludedCompanies, skills, locations, minExperience, maxExperience, minSalary, maxSalary, qualifications, selectedIndustryType, selectedGender, minAge, maxAge, industryInput]);
 
   const getCurrentFilters = useCallback(() => ({
     keywords,

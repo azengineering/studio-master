@@ -98,8 +98,8 @@ export async function GET(request: NextRequest) {
 
     if (filters.excludedKeywords && filters.excludedKeywords.length > 0) {
       filters.excludedKeywords.forEach(keyword => {
-        query += ` AND (jsp.fullName NOT LIKE ? AND jsp.currentDesignation NOT LIKE ? AND jsp.skills NOT LIKE ?)`;
-        params.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`);
+        query += ` AND (jsp.fullName NOT LIKE ? AND jsp.currentDesignation NOT LIKE ? AND jsp.skills NOT LIKE ? AND jsp.currentIndustry NOT LIKE ? AND jsp.currentIndustryType NOT LIKE ?)`;
+        params.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`, `%${keyword}%`, `%${keyword}%`);
       });
     }
 
