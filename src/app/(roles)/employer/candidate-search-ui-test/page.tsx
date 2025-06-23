@@ -1,4 +1,3 @@
-typescript
 'use client';
 
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
