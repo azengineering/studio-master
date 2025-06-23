@@ -31,7 +31,8 @@ export async function GET(
         jsp.maritalStatus,
         jsp.professionalSummary,
         jsp.resumeUrl,
-        jsp.preferredLocations
+        jsp.preferredLocations,
+        jsp.currentIndustryType as industryType
       FROM users u
       JOIN job_seeker_profiles jsp ON u.id = jsp.user_id
       WHERE u.id = ? AND u.role = 'jobSeeker'
@@ -60,7 +61,8 @@ export async function GET(
         companyName as company,
         startDate,
         CASE WHEN isPresent = 1 THEN 'Present' ELSE endDate END as endDate,
-        responsibilities
+        responsibilities,
+        companyDescription
       FROM experience_details ed
       JOIN job_seeker_profiles jsp ON ed.job_seeker_profile_id = jsp.id
       WHERE jsp.user_id = ?
@@ -73,7 +75,8 @@ export async function GET(
       company: exp.company,
       startDate: exp.startDate,
       endDate: exp.endDate,
-      responsibilities: exp.responsibilities ? exp.responsibilities.split('\n').filter(Boolean) : []
+      responsibilities: exp.responsibilities ? exp.responsibilities.split('\n').filter(Boolean) : [],
+      companyDescription: exp.companyDescription || ''
     }));
 
     // Calculate age
@@ -126,6 +129,7 @@ export async function GET(
       location: candidate.location || 'Not specified',
       skills,
       industry: candidate.industry || 'Not specified',
+      industryType: candidate.industryType || 'Not specified',
       qualifications,
       salaryLPA,
       gender: candidate.gender || 'Not specified',

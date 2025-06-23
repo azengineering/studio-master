@@ -119,6 +119,7 @@ interface WorkExperience {
   startDate: string;
   endDate: string; // Or null if current
   responsibilities: string[];
+  companyDescription?: string;
 }
 
 interface Education {
@@ -514,7 +515,11 @@ const WorkExperienceSection: React.FC<WorkExperienceProps> = ({ candidate, desig
                         <Card key={index} className="p-4 border border-border rounded-lg shadow-sm">
                             <div className="space-y-2">
                                 <h4 className="text-base font-semibold text-gray-900">{highlightText(job.company, includedCompanies)}</h4>
-                                <p className="text-sm text-muted-foreground">About Company: Information not available</p>
+                                {job.companyDescription && job.companyDescription.trim() !== '' ? (
+                                    <p className="text-sm text-muted-foreground">About Company: {job.companyDescription}</p>
+                                ) : (
+                                    <p className="text-sm text-muted-foreground">About Company: Information not available</p>
+                                )}
                                 <div className="flex items-center gap-2">
                                     <span className="text-sm font-medium text-gray-800">{highlightText(job.title, [designationInput, ...keywords])}</span>
                                     <span className="text-sm text-muted-foreground">({formatDateToDDMMYY(job.startDate)} - {formatDateToDDMMYY(job.endDate)})</span>
