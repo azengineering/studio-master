@@ -1068,7 +1068,8 @@ export default function CandidateSearchUITestPage() {
   const [includeRelocatingCandidates, setIncludeRelocatingCandidates] = useState(false);
   const [industryInput, setIndustryInput] = useState(''); const [selectedIndustryType, setSelectedIndustryType] = useState(industryTypeOptions[0]);
   const [minExperience, setMinExperience] = useState(''); const [maxExperience, setMaxExperience] = useState('');
-  const [minSalary, setMinSalary] = useState(''); const [maxSalary] = useState('');
+  const [previous_generation>
+minSalary, setMinSalary] = useState(''); const [maxSalary] = useState('');
   const [isAdditionalParametersOpen, setIsAdditionalParametersOpen] = useState(false);
   const [currentQualificationInput, setCurrentQualificationInput] = useState(''); const [qualifications, setQualifications] = useState<string[]>([]); const qualificationInputRef = useRef<HTMLInputElement>(null);
   const [selectedGender, setSelectedGender] = useState(genderOptions[0]);
