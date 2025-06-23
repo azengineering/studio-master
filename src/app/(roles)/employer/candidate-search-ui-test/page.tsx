@@ -585,7 +585,6 @@ interface CandidateDetailProps {
   industryInput: string;
   selectedIndustryType: string;
   qualifications: string[];
-```text
   skills: string[];
 }
 
