@@ -129,7 +129,7 @@ interface Education {
 
 interface Candidate {
   id: string; name: string; designation: string; experience: number; location: string; skills: string[];
-  industry: string; qualifications: string[]; salaryLPA: number; gender: string; age: number;
+  industry: string; industryType?: string; qualifications: string[]; salaryLPA: number; gender: string; age: number;
   profileImageUrl: string; email: string; phone: string; linkedinProfileUrl: string;
   company: string;
   department: string;
@@ -548,7 +548,7 @@ const ProfessionalDetailsSummary: React.FC<ProfessionalDetailsSummaryProps> = ({
             <p className="flex items-center gap-2"><span className="text-muted-foreground text-md mr-1">₹</span> <strong>Present Salary:</strong> {candidate.salaryLPA} LPA</p>
             <p className="flex items-center gap-2"><Briefcase className="h-3.5 w-3.5 text-muted-foreground" /> <strong>Total Experience:</strong> {candidate.experience} Years</p>
             <p className="flex items-center gap-2"><Building className="h-3.5 w-3.5 text-muted-foreground" /> <strong>Industry:</strong> {highlightText(candidate.industry, [industryInput, selectedIndustryType])}</p>
-            <p className="flex items-center gap-2"><Building className="h-3.5 w-3.5 text-muted-foreground" /> <strong>Industry Type:</strong> {highlightText(selectedIndustryType, [industryInput])}</p>
+            <p className="flex items-center gap-2"><Building className="h-3.5 w-3.5 text-muted-foreground" /> <strong>Industry Type:</strong> {highlightText(candidate.industryType || 'Not specified', [industryInput, selectedIndustryType])}</p>
             {candidate.preferredLocations && candidate.preferredLocations.length > 0 && (
                 <p className="flex items-center gap-2"><MapPin className="h-3.5 w-3.5 text-muted-foreground" /> <strong>Preferred Locations:</strong> {highlightText(candidate.preferredLocations.join(', '), locations)}</p>
             )}
@@ -1005,7 +1005,7 @@ const MyWatchlistModal: React.FC<MyWatchlistModalProps> = ({ isOpen, onOpenChang
                             <span className="flex items-center gap-1"><GraduationCap className="h-4 w-4 text-muted-foreground" /><span>{candidate.qualifications.join(', ')}</span></span>
                             <span className="flex items-center gap-1"><Briefcase className="h-4 w-4 text-muted-foreground" /><span>{candidate.experience} Years Exp</span></span>
                             <span className="flex items-center gap-1"><span className="text-muted-foreground text-md">₹</span><span>{candidate.salaryLPA} LPA</span></span>
-                            <span className="flex items-center gap-1"><Building className="h-4 w-4 text-muted-foreground" /><span>{candidate.industry} ({candidate.industry})</span></span>
+                            <span className="flex items-center gap-1"><Building className="h-4 w-4 text-muted-foreground" /><span>{candidate.industry} ({candidate.industryType || 'Not specified'})</span></span>
                       </div>
                       {candidate.preferredLocations.length > 0 && (
                           <div className="mt-2 text-sm text-gray-700 flex items-center gap-1">
@@ -1739,7 +1739,7 @@ export default function CandidateSearchUITestPage() {
                                                   <span className="flex items-center gap-1"><GraduationCap className="h-4 w-4 text-muted-foreground" /><span>{highlightText(candidate.qualifications.join(', '), qualifications)}</span></span>
                                                   <span className="flex items-center gap-1"><Briefcase className="h-4 w-4 text-muted-foreground" /><span>{candidate.experience} Years Experience</span></span>
                                                   <span className="flex items-center gap-1"><span className="text-muted-foreground text-md">₹</span><span>{candidate.salaryLPA} LPA</span></span>
-                                                  <span className="flex items-center gap-1"><Building className="h-4 w-4 text-muted-foreground" /><span>{highlightText(candidate.industry, [industryInput, selectedIndustryType])} ({selectedIndustryType})</span></span>
+                                                  <span className="flex items-center gap-1"><Building className="h-4 w-4 text-muted-foreground" /><span>{highlightText(candidate.industry, [industryInput, selectedIndustryType])} ({candidate.industryType || 'Not specified'})</span></span>
                                               </div>
                                               {candidate.preferredLocations.length > 0 && (
                                                   <div className="mt-2 text-sm text-gray-700 flex items-center gap-1">

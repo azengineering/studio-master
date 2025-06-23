@@ -171,6 +171,37 @@ export async function GET(request: NextRequest) {
     // Execute query
     const candidates = db.prepare(query).all(...params);
 
+    // Get work experience for company names
+    const candidateIds = candidates.map((c: any) => c.id);
+    let workExperienceMap: { [key: string]: any } = {};
+    
+    if (candidateIds.length > 0) {
+      const placeholders = candidateIds.map(() => '?').join(',');
+      const workExpQuery = `
+        SELECT 
+          jsp.user_id,
+          ed.companyName,
+          ed.isPresent,
+          ed.startDate
+        FROM experience_details ed
+        JOIN job_seeker_profiles jsp ON ed.job_seeker_profile_id = jsp.id
+        WHERE jsp.user_id IN (${placeholders})
+        ORDER BY jsp.user_id, ed.startDate DESC
+      `;
+      
+      const workExperiences = db.prepare(workExpQuery).all(...candidateIds);
+      
+      // Group by user_id and get current company (isPresent = 1 or most recent)
+      workExperiences.forEach((exp: any) => {
+        if (!workExperienceMap[exp.user_id]) {
+          workExperienceMap[exp.user_id] = exp.companyName;
+        } else if (exp.isPresent === 1) {
+          // If this is current job, prioritize it
+          workExperienceMap[exp.user_id] = exp.companyName;
+        }
+      });
+    }
+
     // Transform data to match frontend interface
     const transformedCandidates = candidates.map((candidate: any) => {
       // Calculate age from date of birth
@@ -213,6 +244,9 @@ export async function GET(request: NextRequest) {
       // Get qualifications from education (we'll need to fetch this separately)
       const qualifications = ['B.Tech']; // Default for now
 
+      // Get company name from work experience or fallback
+      const currentCompany = workExperienceMap[candidate.id] || 'Not specified';
+
       return {
         id: candidate.id.toString(),
         name: candidate.name || 'Unknown',
@@ -221,6 +255,7 @@ export async function GET(request: NextRequest) {
         location: candidate.location || 'Not specified',
         skills,
         industry: candidate.industry || 'Not specified',
+        industryType: candidate.industryType || 'Not specified',
         qualifications,
         salaryLPA,
         gender: candidate.gender || 'Not specified',
@@ -229,7 +264,7 @@ export async function GET(request: NextRequest) {
         email: candidate.email,
         phone: candidate.phone || '',
         linkedinProfileUrl: candidate.linkedinProfileUrl || '',
-        company: 'Current Company', // This would need to be derived from experience
+        company: currentCompany,
         department: candidate.department || 'Not specified',
         preferredLocations,
         professionalSummary: candidate.professionalSummary,
