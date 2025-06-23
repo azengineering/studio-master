@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 
@@ -32,8 +31,7 @@ export async function GET(
         jsp.maritalStatus,
         jsp.professionalSummary,
         jsp.resumeUrl,
-        jsp.preferredLocations,
-        jsp.currentIndustryType as industryType
+        jsp.preferredLocations
       FROM users u
       JOIN job_seeker_profiles jsp ON u.id = jsp.user_id
       WHERE u.id = ? AND u.role = 'jobSeeker'
@@ -128,7 +126,6 @@ export async function GET(
       location: candidate.location || 'Not specified',
       skills,
       industry: candidate.industry || 'Not specified',
-      industryType: candidate.industryType || 'Not specified',
       qualifications,
       salaryLPA,
       gender: candidate.gender || 'Not specified',

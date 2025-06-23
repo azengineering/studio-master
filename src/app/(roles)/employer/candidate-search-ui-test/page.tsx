@@ -511,14 +511,25 @@ const WorkExperienceSection: React.FC<WorkExperienceProps> = ({ candidate, desig
                 <h3 className="text-lg font-semibold text-primary mb-3 flex items-center gap-2"><Briefcase className="h-4.5 w-4.5" /> Work Experience</h3>
                 <div className="space-y-4">
                     {candidate.workExperience.map((job, index) => (
-                        <Card key={index} className="p-3 border border-border rounded-lg shadow-sm">
-                            <h4 className="text-base font-semibold text-gray-900">{highlightText(job.title, [designationInput, ...keywords])} at {highlightText(job.company, includedCompanies)}</h4>
-                            <p className="text-sm text-muted-foreground mt-0.5">{formatDateToDDMMYY(job.startDate)} - {formatDateToDDMMYY(job.endDate)}</p>
-                            <ul className="list-disc list-inside text-sm text-gray-700 mt-2 space-y-1">
-                                {job.responsibilities.map((resp, respIndex) => (
-                                    <li key={respIndex}>{highlightText(resp, keywords)}</li>
-                                ))}
-                            </ul>
+                        <Card key={index} className="p-4 border border-border rounded-lg shadow-sm">
+                            <div className="space-y-2">
+                                <h4 className="text-base font-semibold text-gray-900">{highlightText(job.company, includedCompanies)}</h4>
+                                <p className="text-sm text-muted-foreground">About Company: Information not available</p>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm font-medium text-gray-800">{highlightText(job.title, [designationInput, ...keywords])}</span>
+                                    <span className="text-sm text-muted-foreground">({formatDateToDDMMYY(job.startDate)} - {formatDateToDDMMYY(job.endDate)})</span>
+                                </div>
+                                {job.responsibilities.length > 0 && (
+                                    <div className="mt-2">
+                                        <p className="text-sm font-medium text-gray-700 mb-1">Responsibilities:</p>
+                                        <ul className="list-disc list-inside text-sm text-gray-700 space-y-1 ml-2">
+                                            {job.responsibilities.map((resp, respIndex) => (
+                                                <li key={respIndex}>{highlightText(resp, keywords)}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                            </div>
                         </Card>
                     ))}
                 </div>
@@ -726,7 +737,7 @@ const CandidateDetail: React.FC<CandidateDetailProps> = React.memo(function Cand
                   </span>
                   <span className="flex items-center gap-1">
                       <Building className="h-3 w-3 text-muted-foreground" />
-                      <span>{highlightText(candidate.industry, [industryInput, selectedIndustryType])} ({highlightText(selectedIndustryType, [industryInput, selectedIndustryType])})</span>
+                      <span>{highlightText(candidate.industry, [industryInput, selectedIndustryType])} ({highlightText(candidate.industryType || 'Not specified', [industryInput, selectedIndustryType])})</span>
                   </span>
               </div>
 
