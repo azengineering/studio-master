@@ -583,7 +583,7 @@ interface CandidateDetailProps {
   designationInput: string;
   includedCompanies: string[];
   locations: string[];
-  industryInput: string```tool_code
+  industryInput: string;
   selectedIndustryType: string;
   qualifications: string[];
   skills: string[];
