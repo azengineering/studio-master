@@ -46,25 +46,20 @@ export async function GET(
       );
     }
 
-    // Get education details with complete information
+    // Get education details
     const education = db.prepare(`
-      SELECT 
-        qualification as degree,
-        stream,
-        institution,
-        yearOfCompletion as year
+      SELECT qualification as degree, institution, yearOfCompletion as year
       FROM education_details ed
       JOIN job_seeker_profiles jsp ON ed.job_seeker_profile_id = jsp.id
       WHERE jsp.user_id = ?
       ORDER BY yearOfCompletion DESC
     `).all(candidateId);
 
-    // Get work experience with complete information
+    // Get work experience
     const workExperience = db.prepare(`
       SELECT 
         designation as title,
         companyName as company,
-        companyDescription,
         startDate,
         CASE WHEN isPresent = 1 THEN 'Present' ELSE endDate END as endDate,
         responsibilities
@@ -78,7 +73,6 @@ export async function GET(
     const transformedWorkExperience = workExperience.map((exp: any) => ({
       title: exp.title,
       company: exp.company,
-      companyDescription: exp.companyDescription || 'No company description available',
       startDate: exp.startDate,
       endDate: exp.endDate,
       responsibilities: exp.responsibilities ? exp.responsibilities.split('\n').filter(Boolean) : []
@@ -154,8 +148,8 @@ export async function GET(
       resumePdfUrl: candidate.resumeUrl || '',
       dob: candidate.dob || '1990-01-01',
       maritalStatus: candidate.maritalStatus || 'Not specified',
-      currentAddress: candidate.currentAddress || 'Address not provided',
-      correspondenceAddress: candidate.correspondenceAddress || 'Address not provided'
+      currentAddress: candidate.currentAddress || 'Not specified',
+      correspondenceAddress: candidate.correspondenceAddress || 'Not specified'
     };
 
     return NextResponse.json(transformedCandidate);

@@ -116,7 +116,6 @@ const AddRemoveTagsInput: React.FC<AddRemoveTagsInputProps> = ({
 interface WorkExperience {
   title: string;
   company: string;
-  companyDescription?: string;
   startDate: string;
   endDate: string; // Or null if current
   responsibilities: string[];
@@ -124,11 +123,8 @@ interface WorkExperience {
 
 interface Education {
   degree: string;
-  stream?: string;
   institution: string;
   year: number;
-  percentage?: number;
-  cgpa?: number;
 }
 
 interface Candidate {
@@ -448,25 +444,13 @@ interface PersonalDetailsProps {
 const PersonalDetails: React.FC<PersonalDetailsProps> = ({ candidate, keywords }) => (
     <div>
         <h3 className="text-lg font-semibold text-primary mb-3 flex items-center gap-2"><User className="h-4.5 w-4.5" /> Personal Details</h3>
-        <div className="space-y-2 text-sm text-gray-700">
+        <div className="space-y-1.5 text-sm text-gray-700">
             <p className="flex items-center gap-2"><User className="h-3.5 w-3.5 text-muted-foreground" /> <strong>Full Name:</strong> {highlightText(candidate.name, keywords)}</p>
             <p className="flex items-center gap-2"><Calendar className="h-3.5 w-3.5 text-muted-foreground" /> <strong>D.O.B:</strong> {formatDateToDDMMYY(candidate.dob)}</p>
             <p className="flex items-center gap-2"><PersonStanding className="h-3.5 w-3.5 text-muted-foreground" /> <strong>Gender:</strong> {candidate.gender}</p>
             <p className="flex items-center gap-2"><PersonStanding className="h-3.5 w-3.5 text-muted-foreground" /> <strong>Marital Status:</strong> {candidate.maritalStatus}</p>
-            <div className="space-y-1">
-                <p className="flex items-start gap-2">
-                    <Home className="h-3.5 w-3.5 text-muted-foreground mt-0.5" /> 
-                    <strong>Current Address:</strong>
-                </p>
-                <p className="ml-5 text-gray-600 leading-relaxed">{candidate.currentAddress}</p>
-            </div>
-            <div className="space-y-1">
-                <p className="flex items-start gap-2">
-                    <MailOpen className="h-3.5 w-3.5 text-muted-foreground mt-0.5" /> 
-                    <strong>Correspondence Address:</strong>
-                </p>
-                <p className="ml-5 text-gray-600 leading-relaxed">{candidate.correspondenceAddress}</p>
-            </div>
+            <p className="flex items-start gap-2"><Home className="h-3.5 w-3.5 text-muted-foreground mt-0.5" /> <strong>Current Address:</strong> {candidate.currentAddress}</p>
+            <p className="flex items-start gap-2"><MailOpen className="h-3.5 w-3.5 text-muted-foreground mt-0.5" /> <strong>Correspondence Address:</strong> {candidate.correspondenceAddress}</p>
         </div>
     </div>
 );
@@ -484,15 +468,9 @@ const EducationalDetails: React.FC<EducationalDetailsProps> = ({ candidate, qual
                 <h3 className="text-lg font-semibold text-primary mb-3 flex items-center gap-2"><GraduationCap className="h-4.5 w-4.5" /> Educational Details</h3>
                 <div className="space-y-3">
                     {candidate.education.map((edu, index) => (
-                        <Card key={index} className="p-4 border border-border rounded-lg shadow-sm">
-                            <h4 className="text-base font-semibold text-gray-900 mb-2">
-                                {highlightText(edu.degree, qualifications)}
-                                {edu.stream && <span className="text-blue-600 ml-2">({edu.stream})</span>}
-                            </h4>
-                            <div className="space-y-1 text-sm text-gray-700">
-                                <p><strong>Institution:</strong> {edu.institution}</p>
-                                <p><strong>Passing Year:</strong> {edu.year}</p>
-                            </div>
+                        <Card key={index} className="p-3 border border-border rounded-lg shadow-sm">
+                            <h4 className="text-base font-semibold text-gray-900">{highlightText(edu.degree, qualifications)}</h4>
+                            <p className="text-sm text-muted-foreground mt-0.5">{edu.institution}, {edu.year}</p>
                         </Card>
                     ))}
                 </div>
@@ -533,40 +511,14 @@ const WorkExperienceSection: React.FC<WorkExperienceProps> = ({ candidate, desig
                 <h3 className="text-lg font-semibold text-primary mb-3 flex items-center gap-2"><Briefcase className="h-4.5 w-4.5" /> Work Experience</h3>
                 <div className="space-y-4">
                     {candidate.workExperience.map((job, index) => (
-                        <Card key={index} className="p-4 border border-border rounded-lg shadow-sm">
-                            <div className="space-y-3">
-                                {/* 1st row: Company name */}
-                                <h4 className="text-lg font-bold text-blue-600">
-                                    {highlightText(job.company, includedCompanies)}
-                                </h4>
-                                
-                                {/* 2nd row: About company */}
-                                <div className="text-sm text-gray-600 leading-relaxed">
-                                    <strong>About Company:</strong> {job.companyDescription || 'No company description available'}
-                                </div>
-                                
-                                {/* 3rd row: Designation with working period */}
-                                <div className="text-base font-semibold text-gray-900">
-                                    <span className="text-primary">{highlightText(job.title, [designationInput, ...keywords])}</span>
-                                    <span className="ml-2 text-sm font-normal text-muted-foreground">
-                                        ({formatDateToDDMMYY(job.startDate)} - {formatDateToDDMMYY(job.endDate)})
-                                    </span>
-                                </div>
-                                
-                                {/* Below designation: Responsibilities */}
-                                {job.responsibilities && job.responsibilities.length > 0 && (
-                                    <div>
-                                        <h5 className="text-sm font-semibold text-gray-800 mb-2">Key Responsibilities:</h5>
-                                        <ul className="list-disc list-inside text-sm text-gray-700 space-y-1 ml-2">
-                                            {job.responsibilities.map((resp, respIndex) => (
-                                                <li key={respIndex} className="leading-relaxed">
-                                                    {highlightText(resp, keywords)}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                )}
-                            </div>
+                        <Card key={index} className="p-3 border border-border rounded-lg shadow-sm">
+                            <h4 className="text-base font-semibold text-gray-900">{highlightText(job.title, [designationInput, ...keywords])} at {highlightText(job.company, includedCompanies)}</h4>
+                            <p className="text-sm text-muted-foreground mt-0.5">{formatDateToDDMMYY(job.startDate)} - {formatDateToDDMMYY(job.endDate)}</p>
+                            <ul className="list-disc list-inside text-sm text-gray-700 mt-2 space-y-1">
+                                {job.responsibilities.map((resp, respIndex) => (
+                                    <li key={respIndex}>{highlightText(resp, keywords)}</li>
+                                ))}
+                            </ul>
                         </Card>
                     ))}
                 </div>
@@ -595,8 +547,8 @@ const ProfessionalDetailsSummary: React.FC<ProfessionalDetailsSummaryProps> = ({
             <p className="flex items-center gap-2"><Building className="h-3.5 w-3.5 text-muted-foreground" /> <strong>Department:</strong> {candidate.department}</p>
             <p className="flex items-center gap-2"><span className="text-muted-foreground text-md mr-1">₹</span> <strong>Present Salary:</strong> {candidate.salaryLPA} LPA</p>
             <p className="flex items-center gap-2"><Briefcase className="h-3.5 w-3.5 text-muted-foreground" /> <strong>Total Experience:</strong> {candidate.experience} Years</p>
-            <p className="flex items-center gap-2"><Building className="h-3.5 w-3.5 text-muted-foreground" /> <strong>Industry:</strong> {highlightText(candidate.industry, [industryInput])}</p>
-            <p className="flex items-center gap-2"><Building className="h-3.5 w-3.5 text-muted-foreground" /> <strong>Industry Type:</strong> {highlightText(candidate.industryType === 'All Industry Types' ? 'Not specified' : candidate.industryType, [selectedIndustryType])}</p>
+            <p className="flex items-center gap-2"><Building className="h-3.5 w-3.5 text-muted-foreground" /> <strong>Industry:</strong> {highlightText(candidate.industry, [industryInput, selectedIndustryType])}</p>
+            <p className="flex items-center gap-2"><Building className="h-3.5 w-3.5 text-muted-foreground" /> <strong>Industry Type:</strong> {highlightText(candidate.industryType || 'Not specified', [industryInput, selectedIndustryType])}</p>
             {candidate.preferredLocations && candidate.preferredLocations.length > 0 && (
                 <p className="flex items-center gap-2"><MapPin className="h-3.5 w-3.5 text-muted-foreground" /> <strong>Preferred Locations:</strong> {highlightText(candidate.preferredLocations.join(', '), locations)}</p>
             )}

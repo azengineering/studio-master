@@ -245,7 +245,7 @@ export async function GET(request: NextRequest) {
       const qualifications = ['B.Tech']; // Default for now
 
       // Get company name from work experience or fallback
-      const currentCompany = workExperienceMap[candidate.id] || 'Current Company';
+      const currentCompany = workExperienceMap[candidate.id] || 'Not specified';
 
       return {
         id: candidate.id.toString(),
@@ -255,7 +255,7 @@ export async function GET(request: NextRequest) {
         location: candidate.location || 'Not specified',
         skills,
         industry: candidate.industry || 'Not specified',
-        industryType: candidate.industryType || 'All Industry Types',
+        industryType: candidate.industryType || 'Not specified',
         qualifications,
         salaryLPA,
         gender: candidate.gender || 'Not specified',
